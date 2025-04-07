@@ -1,0 +1,965 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripInsight - Discover Incredible India</title>
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #508D4E;
+      --secondary-color: #1A5319;
+      --accent-color: #80AF81;
+      --light-color: #D6EFD8;
+      --text-color: #333;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --dark-gray: #495057;
+      --border-radius: 8px;
+      --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      --hover-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background: white;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      padding: 5px 0;
+    }
+
+    .nav-links a:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--primary-color);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover:after,
+    .nav-links a.active:after {
+      width: 100%;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary-color);
+    }
+
+    .nav-button {
+      padding: 10px 24px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 12px;
+    }
+
+    .nav-button:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .nav-button a {
+      color: white;
+    }
+
+    .nav-links-box-2 {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      min-height: 600px;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)),
+                  url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3') center/cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      padding: 0 20px;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    }
+
+    /* Search Container */
+    .search-container {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--light-gray);
+      border-radius: var(--border-radius);
+      padding: 0 15px;
+      transition: var(--transition);
+    }
+
+    .search-input:focus-within {
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+
+    .search-input i {
+      color: var(--primary-color);
+      font-size: 18px;
+    }
+
+    .search-input input {
+      border: none;
+      background: transparent;
+      padding: 15px;
+      width: 100%;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .search-input input:focus {
+      outline: none;
+    }
+
+    .filter-toggle {
+      background: var(--light-gray);
+      color: var(--text-color);
+      border: none;
+      padding: 0 20px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .filter-toggle:hover {
+      background: var(--medium-gray);
+    }
+
+    .search-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0 25px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .search-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .search-filters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .search-filters.show {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--medium-gray);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dark-gray);
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      color: var(--text-color);
+      background-color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(80, 141, 78, 0.1);
+    }
+
+    /* Featured Destinations Section */
+    .featured-destinations {
+      padding: 80px 0;
+      background: white;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-header h2:after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 3px;
+      background: var(--primary-color);
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .section-header p {
+      color: var(--dark-gray);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .destination-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 25px;
+    }
+
+    .destination-card {
+      position: relative;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+    }
+
+    .destination-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .destination-card.large {
+      grid-column: span 8;
+      grid-row: span 1;
+    }
+
+    .destination-card:not(.large) {
+      grid-column: span 4;
+    }
+
+    .destination-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .destination-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 25px;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: white;
+    }
+
+    .card-content h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .card-content p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Top Places Section */
+    .top-places {
+      padding: 80px 0;
+      background: var(--light-gray);
+    }
+
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .place-card {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .place-img {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .place-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .place-card:hover .place-img img {
+      transform: scale(1.1);
+    }
+
+    .place-tag {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--primary-color);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .place-details {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place-details h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .place-card:hover .place-details h3 {
+      color: var(--primary-color);
+    }
+
+    .place-details p {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .place-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .place-location {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .place-link {
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .place-link:hover {
+      color: var(--secondary-color);
+    }
+
+    /* Call to Action Section */
+    .cta-section {
+      padding: 100px 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)),
+                  url('https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3') center/cover;
+      color: white;
+      text-align: center;
+    }
+
+    .cta-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .cta-content h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .cta-content p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 15px 30px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .cta-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-5px);
+    }
+
+    /* Footer */
+    .footer {
+      background: #222;
+      color: white;
+      padding: 80px 0 20px;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--light-color);
+    }
+
+    .footer-section p {
+      color: #aaa;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section ul a {
+      color: #aaa;
+      transition: var(--transition);
+    }
+
+    .footer-section ul a:hover {
+      color: var(--light-color);
+      padding-left: 5px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      color: white;
+      transition: var(--transition);
+    }
+
+    .social-links a:hover {
+      background: var(--primary-color);
+      transform: translateY(-5px);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #444;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 3rem;
+      }
+
+      .destination-card.large {
+        grid-column: span 12;
+      }
+
+      .destination-card:not(.large) {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        height: auto;
+        padding: 120px 0 60px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-filters {
+        grid-template-columns: 1fr;
+      }
+
+      .destination-card:not(.large) {
+        grid-column: span 12;
+      }
+
+      .places-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+
+    @media (max-width: 576px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .section-header h2 {
+        font-size: 2rem;
+      }
+
+      .places-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-content h2 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  
+
+  {% include 'includes/notifications.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Discover Incredible India</h1>
+      <p>From the majestic Himalayas to serene backwaters, experience the diverse beauty and rich cultural heritage of India</p>
+      <div class="search-container">
+        <form method="get" action="{% url 'search' %}">
+          <div class="search-box">
+            <div class="search-input">
+              <i class="fa-solid fa-location-dot"></i>
+              <input type="text" name="q" value="{{ query }}" placeholder="Search for destinations, experiences, or attractions...">
+            </div>
+            <button type="button" class="filter-toggle" onclick="toggleFilters()">
+              <i class="fa-solid fa-sliders"></i>
+              Filters
+            </button>
+            <button type="submit" class="search-button">
+              <i class="fa-solid fa-search"></i>
+              Search
+            </button>
+          </div>
+
+          <div class="search-filters" id="searchFilters">
+            <div class="filter-group">
+              <label>State</label>
+              <select name="state">
+                <option value="">All States</option>
+                <option value="maharashtra" {% if state == 'maharashtra' %}selected{% endif %}>Maharashtra</option>
+                <option value="rajasthan" {% if state == 'rajasthan' %}selected{% endif %}>Rajasthan</option>
+                <option value="kerala" {% if state == 'kerala' %}selected{% endif %}>Kerala</option>
+                <option value="gujarat" {% if state == 'gujarat' %}selected{% endif %}>Gujarat</option>
+                <option value="karnataka" {% if state == 'karnataka' %}selected{% endif %}>Karnataka</option>
+                <option value="tamil_nadu" {% if state == 'tamil_nadu' %}selected{% endif %}>Tamil Nadu</option>
+                <option value="andhra_pradesh" {% if state == 'andhra_pradesh' %}selected{% endif %}>Andhra Pradesh</option>
+                <option value="goa" {% if state == 'goa' %}selected{% endif %}>Goa</option>
+                <option value="himachal_pradesh" {% if state == 'himachal_pradesh' %}selected{% endif %}>Himachal Pradesh</option>
+                <option value="uttarakhand" {% if state == 'uttarakhand' %}selected{% endif %}>Uttarakhand</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label>Place Type</label>
+              <select name="type">
+                <option value="">All Types</option>
+                <option value="beach" {% if type == 'beach' %}selected{% endif %}>Beaches</option>
+                <option value="mountain" {% if type == 'mountain' %}selected{% endif %}>Mountains</option>
+                <option value="heritage" {% if type == 'heritage' %}selected{% endif %}>Heritage Sites</option>
+                <option value="wildlife" {% if type == 'wildlife' %}selected{% endif %}>Wildlife</option>
+                <option value="pilgrimage" {% if type == 'pilgrimage' %}selected{% endif %}>Pilgrimage</option>
+                <option value="adventure" {% if type == 'adventure' %}selected{% endif %}>Adventure</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Destinations Section -->
+  <section class="featured-destinations">
+    <div class="container">
+      <div class="section-header">
+        <h2>Featured Destinations</h2>
+        <p>Explore the most iconic and breathtaking places across India</p>
+      </div>
+
+      <div class="destination-grid">
+        <div class="destination-card large">
+          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?ixlib=rb-4.0.3" alt="Taj Mahal">
+          <div class="card-content">
+            <h3>Taj Mahal, Agra</h3>
+            <p>The iconic symbol of eternal love and one of the Seven Wonders of the World</p>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3" alt="Varanasi">
+          <div class="card-content">
+            <h3>Varanasi</h3>
+            <p>The spiritual heart of India</p>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1567157577867-05ccb1388e66?ixlib=rb-4.0.3" alt="Jaipur">
+          <div class="card-content">
+            <h3>Jaipur</h3>
+            <p>The Pink City of Rajasthan</p>
+          </div>
+        </div>
+
+        <div class="destination-card large">
+          <img src="https://images.unsplash.com/photo-1566552881560-0be862a7c445?ixlib=rb-4.0.3" alt="Golden Temple">
+          <div class="card-content">
+            <h3>Golden Temple, Amritsar</h3>
+            <p>The holiest Gurdwara and spiritual center for Sikhs worldwide</p>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1544123311-8b5abd81a437?ixlib=rb-4.0.3" alt="Kerala Backwaters">
+          <div class="card-content">
+            <h3>Kerala Backwaters</h3>
+            <p>Serene network of canals and lagoons</p>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?ixlib=rb-4.0.3" alt="Ladakh">
+          <div class="card-content">
+            <h3>Ladakh</h3>
+            <p>The land of high passes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Places Section -->
+  <section class="top-places">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Top Places</h2>
+        <p>Discover handpicked destinations that showcase India's diverse beauty</p>
+      </div>
+
+      <div class="places-grid">
+        {% for i in places %}
+        <div class="place-card">
+          <div class="place-img">
+            <img src="{{ i.Image_url }}" alt="{{ i.Name }}">
+            {% if i.Type %}
+            <div class="place-tag">{{ i.Type }}</div>
+            {% endif %}
+          </div>
+          <div class="place-details">
+            <h3>{{ i.Name }}</h3>
+            <p>{{ i.Description|truncatechars:100 }}</p>
+            <div class="place-footer">
+              <div class="place-location">{{ i.State }}</div>
+              <a href="/details/{{ i.id }}" class="place-link">
+                Explore <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Explore India?</h2>
+        <p>Discover the perfect destination for your next adventure with our comprehensive travel guides and authentic reviews</p>
+        <a href="/explore" class="cta-button">Start Exploring</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>About TripInsight</h3>
+          <p>Your trusted companion for exploring the diverse beauty and rich cultural heritage of incredible India, providing authentic travel experiences and insights.</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Destinations</h3>
+          <ul>
+            <li><a href="/search/?state=Rajasthan">Rajasthan</a></li>
+            <li><a href="/search/?state=Kerala">Kerala</a></li>
+            <li><a href="/search/?state=Goa">Goa</a></li>
+            <li><a href="/search/?state=Himachal+Pradesh">Himachal Pradesh</a></li>
+            <li><a href="/search/?state=Uttarakhand">Uttarakhand</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/explore">Explore</a></li>
+            <li><a href="/stories">Travel Stories</a></li>
+            <li><a href="/profile">My Profile</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Safety Information</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 TripInsight. All rights reserved. Discover India's wonders with us.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate elements on scroll
+      const animateElements = document.querySelectorAll('.place-card, .destination-card');
+
+      // Set initial state
+      animateElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      });
+
+      function checkScroll() {
+        animateElements.forEach(el => {
+          const elementTop = el.getBoundingClientRect().top;
+          const elementVisible = 150;
+
+          if (elementTop < window.innerHeight - elementVisible) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }
+        });
+      }
+
+      // Run on page load
+      checkScroll();
+
+      // Run on scroll
+      window.addEventListener('scroll', checkScroll);
+    });
+
+    function toggleFilters() {
+      const filters = document.getElementById('searchFilters');
+      filters.classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

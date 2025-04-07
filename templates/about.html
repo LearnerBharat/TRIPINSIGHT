@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About TripInsight - Your Travel Companion</title>
+    <meta name="description" content="Learn about TripInsight, your trusted companion for exploring the diverse beauty of India. Discover our mission, features, and the team behind the platform.">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/about.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+  </head>
+  <body>
+    {% include 'includes/notifications.html' %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <h1>Discover the Heart of India</h1>
+        <p>
+          Your trusted companion in exploring the diverse beauty and rich
+          cultural heritage of incredible India
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="number">10M+</span>
+            <span class="label">Monthly Visitors</span>
+          </div>
+          <div class="stat">
+            <span class="number">500K+</span>
+            <span class="label">Verified Reviews</span>
+          </div>
+          <div class="stat">
+            <span class="number">1000+</span>
+            <span class="label">Destinations</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Mission Section -->
+      <section class="mission-section">
+        <div class="section-header">
+          <h2>Our Mission</h2>
+          <p>
+            Empowering travelers to explore India's wonders with confidence and
+            authenticity
+          </p>
+        </div>
+        <div class="mission-grid">
+          <div class="mission-card">
+            <i class="fas fa-compass"></i>
+            <h3>Authentic Experiences</h3>
+            <p>
+              Curating genuine travel experiences that showcase India's diverse
+              culture
+            </p>
+          </div>
+          <div class="mission-card">
+            <i class="fas fa-users"></i>
+            <h3>Community First</h3>
+            <p>
+              Building a trusted community of passionate travelers sharing real
+              insights
+            </p>
+          </div>
+          <div class="mission-card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Reliable Information</h3>
+            <p>
+              Providing verified and up-to-date travel information you can trust
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features-section">
+        <div class="section-header">
+          <h2>Why Choose Us</h2>
+          <p>Experience travel planning like never before</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>Expert Reviews</h3>
+            <p>In-depth reviews from experienced travelers and local experts</p>
+          </div>
+          <div class="feature-card">
+            <h3>Smart Planning</h3>
+            <p>Intelligent tools to help you plan the perfect trip</p>
+          </div>
+          <div class="feature-card">
+            <h3>Local Insights</h3>
+            <p>Deep local knowledge and cultural understanding</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team Section -->
+      <section class="team-section">
+        <div class="section-header">
+          <h2>Meet Our Team</h2>
+          <p>The passionate minds behind your travel experiences</p>
+        </div>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-image">
+              <img
+                src="https://media.licdn.com/dms/image/v2/D4D03AQH6FNjHAZGruQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1730619123927?e=1748476800&v=beta&t=d5NGqYmQdT9h7imHq_DUHBfLT3g0HGH8JxpZ6PtEDmo"
+                alt="Bharat Sharma"
+              />
+            </div>
+            <div class="team-info">
+              <h3>Bharat Sharma</h3>
+              <span>Backend Developer</span>
+              <p>Built TripInsight Platform</p>
+              <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-image">
+              <img
+                src="https://media.licdn.com/dms/image/v2/D4D03AQF8Ta3so0b4UA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718222176294?e=1748476800&v=beta&t=xfhb2QFB6feP-JAC_A5Nm9JcA2MS-xsfv0xLFhs_tYU"
+                alt="Shrushti Sabale"
+              />
+            </div>
+            <div class="team-info">
+              <h3>Shrushti Sabale</h3>
+              <span>Social Media Executive</span>
+              <p>Crafts Engaging Strategies</p>
+              <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-image">
+              <img
+                src="https://media.licdn.com/dms/image/v2/D4D03AQEEBbmmMxMtEg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1721780100644?e=1748476800&v=beta&t=U1fwQ_jnKxRwFmuYDvLolgS3wk0PRYnLnh6J19dydbg"
+                alt="Vedant Salunkhe"
+              />
+            </div>
+            <div class="team-info">
+              <h3>Vedant Salunkhe</h3>
+              <span>Data Operations</span>
+              <p>Analytics and Integration</p>
+              <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-image">
+              <img
+                src="https://media.licdn.com/dms/image/v2/D4D03AQEEBbmmMxMtEg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1721780100644?e=1748476800&v=beta&t=U1fwQ_jnKxRwFmuYDvLolgS3wk0PRYnLnh6J19dydbg"
+                alt="Rohit Shinde"
+              />
+            </div>
+            <div class="team-info">
+              <h3>Rohit Shinde</h3>
+              <span>Frontend Developer</span>
+              <p>User-friendly Interfaces</p>
+              <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Connect Section -->
+      <section class="connect-section">
+        <div class="connect-content">
+          <h2>Join Our Community</h2>
+          <p>
+            Connect with fellow travelers and stay updated with the latest
+            travel stories
+          </p>
+          <div class="social-grid">
+            <a href="#" class="social-card facebook">
+              <i class="fab fa-facebook-f"></i>
+              <span>Facebook</span>
+            </a>
+            <a href="#" class="social-card instagram">
+              <i class="fab fa-instagram"></i>
+              <span>Instagram</span>
+            </a>
+            <a href="#" class="social-card youtube">
+              <i class="fab fa-youtube"></i>
+              <span>YouTube</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {% include 'includes/footer.html' %}
+  </body>
+</html>

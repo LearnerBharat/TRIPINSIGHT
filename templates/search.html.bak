@@ -1,0 +1,589 @@
+{% load static %} {% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TripAdvisor India - Discover Incredible India</title>
+    <link rel="stylesheet" href="{% static 'index.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #49b668;
+        --secondary-color: #33a25c;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --border-radius: 12px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background-color: #fff;
+        color: var(--text-color);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      /* Navbar Styles */
+      .navbar {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+      }
+      .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+      .nav-brand i {
+        font-size: 28px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+      }
+      .nav-links a {
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: var(--primary-color);
+      }
+      .nav-button {
+        padding: 10px 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 12px;
+      }
+      .nav-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .nav-links-box-2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      /* Hero Section (Search/Intro) */
+      .search-container {
+        padding: 140px 20px 40px; /* extra top padding for fixed navbar */
+        text-align: center;
+        color: white;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3")
+            center/cover;
+      }
+      .search-wrapper h1 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+      }
+      .search-form {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+      .search-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px 16px;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+      }
+      .search-select {
+        padding: 12px 16px;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        min-width: 150px;
+      }
+      .search-button {
+        padding: 12px 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .search-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      /* Results Section */
+      .results-section {
+        padding: 40px 0;
+      }
+      .results-header {
+        margin-bottom: 20px;
+      }
+      .results-header h2 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .results-header p {
+        color: #666;
+      }
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .result-card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+      .result-card:hover {
+        transform: translateY(-5px);
+      }
+      .result-image {
+        height: 200px;
+        overflow: hidden;
+      }
+      .result-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      .result-card:hover .result-image img {
+        transform: scale(1.05);
+      }
+      .result-info {
+        padding: 20px;
+      }
+      .result-info h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .result-info p {
+        color: #666;
+        margin-bottom: 12px;
+      }
+      .result-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 14px;
+      }
+      .result-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .result-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .result-tag {
+        background: var(--light-gray);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        color: #666;
+      }
+      /* Filters Section */
+      .filters-section {
+        background: var(--light-gray);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+      }
+      .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .filters-header h3 {
+        font-size: 18px;
+      }
+      .filters-header button {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      .filter-group {
+        margin-bottom: 16px;
+      }
+      .filter-group h4 {
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+      .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .filter-option input {
+        margin: 0;
+      }
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        gap: 8px;
+      }
+      .pagination a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--light-gray);
+        transition: all 0.3s ease;
+      }
+      .pagination a:hover,
+      .pagination a.active {
+        background: var(--primary-color);
+        color: white;
+      }
+      /* Footer */
+      .footer {
+        background: #333;
+        color: white;
+        padding: 60px 0 20px;
+        margin-top: 60px;
+      }
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 30px;
+      }
+      .footer-section h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: var(--secondary-color);
+      }
+      .footer-section ul {
+        list-style: none;
+      }
+      .footer-section ul li {
+        margin-bottom: 12px;
+      }
+      .footer-section ul a {
+        color: #ccc;
+        transition: color 0.3s ease;
+      }
+      .footer-section ul a:hover {
+        color: var(--primary-color);
+      }
+      .social-links {
+        display: flex;
+        gap: 16px;
+      }
+      .social-links a {
+        color: white;
+        font-size: 20px;
+        transition: all 0.3s ease;
+      }
+      .social-links a:hover {
+        color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #444;
+        color: #888;
+      }
+      /* Responsive */
+      @media (max-width: 768px) {
+        .search-form {
+          flex-direction: column;
+        }
+        .search-input,
+        .search-select,
+        .search-button {
+          width: 100%;
+        }
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+        .filters-grid {
+          grid-template-columns: 1fr;
+        }
+        .footer-content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-brand">
+          <i class="fas fa-globe-asia"></i>
+          <span>TripInsight</span>
+        </div>
+        <div class="nav-links-box-2">
+          <div class="nav-links">
+            <a href="/" class="active">Home</a>
+            <a href="/about">About</a>
+            <a href="/explore">Explore</a>
+            <a href="/stories">Travel Stories</a>
+          </div>
+          <button class="nav-button">
+            <i class="fas fa-user"></i>
+            Sign In
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search/Intro Section (Hero) -->
+    <div class="search-container">
+      <div class="search-wrapper container">
+        <h1>Discover Places in India</h1>
+        <form class="search-form" action="/search" method="GET">
+          <input
+            type="text"
+            name="q"
+            class="search-input"
+            placeholder="Search destinations, attractions, or experiences..."
+            value="{{ query }}"
+          />
+          <select name="state" class="search-select">
+            <option value="">All States</option>
+            <option value="Rajasthan" {% if state == 'Rajasthan' %}selected{% endif %}>Rajasthan</option>
+            <option value="Uttar Pradesh" {% if state == 'Uttar Pradesh' %}selected{% endif %}>Uttar Pradesh</option>
+            <option value="Goa" {% if state == 'Goa' %}selected{% endif %}>Goa</option>
+            <option value="Kerala" {% if state == 'Kerala' %}selected{% endif %}>Kerala</option>
+            <option value="Maharashtra" {% if state == 'Maharashtra' %}selected{% endif %}>Maharashtra</option>
+            <option value="Tamil Nadu" {% if state == 'Tamil Nadu' %}selected{% endif %}>Tamil Nadu</option>
+          </select>
+          <select name="type" class="search-select">
+            <option value="">All Types</option>
+            <option value="Beach" {% if type == 'Beach' %}selected{% endif %}>Beaches</option>
+            <option value="Mountain" {% if type == 'Mountain' %}selected{% endif %}>Mountains</option>
+            <option value="Heritage" {% if type == 'Heritage' %}selected{% endif %}>Heritage</option>
+            <option value="Temple" {% if type == 'Temple' %}selected{% endif %}>Temples</option>
+            <option value="Wildlife" {% if type == 'Wildlife' %}selected{% endif %}>Wildlife</option>
+          </select>
+          <button type="submit" class="search-button">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section container">
+      <div class="results-header">
+        <h2>Search Results</h2>
+        <p>
+          {% if query %}Showing results for "{{ query }}"{% endif %} {% if state
+          %}in {{ state }}{% endif %} {% if type %}of type {{ type }}{% endif %}
+        </p>
+      </div>
+
+      <!-- Filters Section (Optional) -->
+      <!-- <div class="filters-section">
+        <div class="filters-header">
+          <h3>Filters</h3>
+          <button>Clear All</button>
+        </div>
+        <div class="filters-grid">
+          <div class="filter-group">
+            <h4>Rating</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" name="rating" value="5" />
+                5 Stars
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="rating" value="4" />
+                4+ Stars
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="rating" value="3" />
+                3+ Stars
+              </label>
+            </div>
+          </div>
+          <div class="filter-group">
+            <h4>Price Range</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" name="price" value="budget" />
+                Budget
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="price" value="mid" />
+                Mid-range
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="price" value="luxury" />
+                Luxury
+              </label>
+            </div>
+          </div>
+          <div class="filter-group">
+            <h4>Experience Type</h4>
+            <div class="filter-options">
+              <label class="filter-option">
+                <input type="checkbox" name="experience" value="adventure" />
+                Adventure
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="experience" value="cultural" />
+                Cultural
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="experience" value="relaxation" />
+                Relaxation
+              </label>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="results-grid">
+        {% for i in places %}
+        <div class="result-card">
+          <a href="/details/{{ i.id }}">
+            <div class="result-image">
+              <img src="{{ i.Image_url }}" alt="{{ i.Name }}" />
+            </div>
+            <div class="result-info">
+              <h3>{{ i.Name }}</h3>
+              <div class="result-tags">
+                <span class="result-tag">{{ i.Type }}</span>
+                <span class="result-tag">{{ i.State }}</span>
+              </div>
+              <p>
+                {{ i.Description|truncatechars:100 }}
+              </p>
+              <div class="result-meta">
+                <span
+                  ><i class="fas fa-map-marker-alt"></i> {{ i.City }}, {{
+                  i.State }}</span
+                >
+                <span><i class="fas fa-star"></i> 4.5 (120 reviews)</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0">
+          <h3>No results found</h3>
+          <p>Try adjusting your search criteria or explore our recommendations below</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination (if needed) -->
+      <!-- <div class="pagination">
+        <a href="#" class="active">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">4</a>
+        <a href="#">5</a>
+        <a href="#"><i class="fas fa-chevron-right"></i></a>
+      </div> -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>About TripInsight</h3>
+            <p>
+              Your trusted companion for exploring the diverse beauty of India.
+            </p>
+          </div>
+          <div class="footer-section">
+            <h3>Popular Destinations</h3>
+            <ul>
+              <li><a href="#">Goa</a></li>
+              <li><a href="#">Rajasthan</a></li>
+              <li><a href="#">Kerala</a></li>
+              <li><a href="#">Himachal Pradesh</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#">Write a Review</a></li>
+              <li><a href="#">Add a Place</a></li>
+              <li><a href="#">Travel Forum</a></li>
+              <li><a href="#">Help Center</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Connect With Us</h3>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 TripInsight. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

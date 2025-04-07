@@ -1,0 +1,683 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+    <style>
+      :root {
+        --primary-color: #49b668;
+        --secondary-color: #33a25c;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --border-radius: 12px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Afacad Flux", sans-serif;
+      }
+      body {
+        background-color: #fff;
+        color: var(--text-color);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      /* Navbar Styles */
+      .navbar {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+      }
+      .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+      .nav-brand i {
+        font-size: 28px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+      }
+      .nav-links a {
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: var(--primary-color);
+      }
+      .nav-button {
+        padding: 10px 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 12px;
+      }
+      .nav-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .nav-links-box-2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3")
+            center/cover;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        padding: 120px 20px 60px;
+        margin-top: 70px; /* account for fixed navbar */
+      }
+      .hero-content h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .hero-content p {
+        font-size: 20px;
+        margin-bottom: 40px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      .search-box {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .search-box input {
+        flex: 1;
+        padding: 16px 20px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+      }
+      .search-box button {
+        padding: 16px 24px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      .search-box button:hover {
+        background-color: var(--secondary-color);
+      }
+      /* Featured Destinations */
+      .featured-section {
+        padding: 60px 0;
+      }
+      .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .section-header h2 {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .section-header p {
+        font-size: 18px;
+        color: #666;
+      }
+      .destinations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .destination-card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+      .destination-card:hover {
+        transform: translateY(-5px);
+      }
+      .destination-image {
+        height: 200px;
+        overflow: hidden;
+      }
+      .destination-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      .destination-card:hover .destination-image img {
+        transform: scale(1.05);
+      }
+      .destination-info {
+        padding: 20px;
+      }
+      .destination-info h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .destination-info p {
+        color: #666;
+        margin-bottom: 12px;
+      }
+      .destination-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 14px;
+      }
+      .destination-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      /* Categories Section */
+      .categories-section {
+        padding: 60px 0;
+        background-color: var(--light-gray);
+      }
+      .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+      }
+      .category-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 24px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+      }
+      .category-card:hover {
+        transform: translateY(-5px);
+      }
+      .category-card i {
+        font-size: 36px;
+        color: var(--primary-color);
+        margin-bottom: 16px;
+      }
+      .category-card h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .category-card p {
+        color: #666;
+        font-size: 14px;
+      }
+      /* Testimonials Section */
+      .testimonials-section {
+        padding: 60px 0;
+      }
+      .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .testimonial-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .testimonial-content {
+        font-style: italic;
+        margin-bottom: 16px;
+        color: #444;
+        line-height: 1.6;
+      }
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .testimonial-author img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .author-info h4 {
+        margin-bottom: 4px;
+      }
+      .author-info span {
+        color: #666;
+        font-size: 14px;
+      }
+      /* CTA Section */
+      .cta-section {
+        padding: 80px 0;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+          url("https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3")
+            center/cover;
+        color: white;
+        text-align: center;
+      }
+      .cta-content h2 {
+        font-size: 36px;
+        margin-bottom: 16px;
+      }
+      .cta-content p {
+        font-size: 18px;
+        margin-bottom: 32px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .cta-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .cta-button {
+        padding: 12px 24px;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .cta-button.primary {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+      }
+      .cta-button.primary:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .cta-button.secondary {
+        background-color: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+      .cta-button.secondary:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+      /* Footer */
+      .footer {
+        background: #333;
+        color: white;
+        padding: 60px 0 20px;
+      }
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 30px;
+      }
+      .footer-section h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+        color: var(--secondary-color);
+      }
+      .footer-section ul {
+        list-style: none;
+      }
+      .footer-section ul li {
+        margin-bottom: 12px;
+      }
+      .footer-section ul a {
+        color: #ccc;
+        transition: color 0.3s ease;
+      }
+      .footer-section ul a:hover {
+        color: var(--primary-color);
+      }
+      .social-links {
+        display: flex;
+        gap: 16px;
+      }
+      .social-links a {
+        color: white;
+        font-size: 20px;
+        transition: all 0.3s ease;
+      }
+      .social-links a:hover {
+        color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #444;
+        color: #888;
+      }
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero-content h1 {
+          font-size: 32px;
+        }
+        .hero-content p {
+          font-size: 16px;
+        }
+        .search-box {
+          flex-direction: column;
+        }
+        .search-box input {
+          width: 100%;
+        }
+        .cta-buttons {
+          flex-direction: column;
+        }
+        .footer-content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-brand">
+          <i class="fas fa-globe-asia"></i>
+          <span>TripInsight</span>
+        </div>
+        <div class="nav-links-box-2">
+          <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">About</a>
+            <a href="#">Explore</a>
+            <a href="#">Travel Stories</a>
+          </div>
+          <button class="nav-button">
+            <i class="fas fa-user"></i>
+            Sign In
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content container">
+        <h1>Discover the Heart of India</h1>
+        <p>
+          Explore the diverse beauty and rich cultural heritage of incredible
+          India
+        </p>
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="Search for destinations, attractions, or experiences..."
+          />
+          <button>Search</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Destinations -->
+    <section class="featured-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Featured Destinations</h2>
+          <p>Explore some of India's most beloved travel destinations</p>
+        </div>
+        <div class="destinations-grid">
+          <div class="destination-card">
+            <div class="destination-image">
+              <img
+                src="https://images.unsplash.com/photo-1564507592333-c60657eea523?ixlib=rb-4.0.3"
+                alt="Taj Mahal"
+              />
+            </div>
+            <div class="destination-info">
+              <h3>Taj Mahal, Agra</h3>
+              <p>
+                The iconic marble mausoleum and a UNESCO World Heritage Site.
+              </p>
+              <div class="destination-meta">
+                <span><i class="fas fa-star"></i> 4.8 (2.5k reviews)</span>
+                <span><i class="fas fa-map-marker-alt"></i> Uttar Pradesh</span>
+              </div>
+            </div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-image">
+              <img
+                src="https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3"
+                alt="Goa Beaches"
+              />
+            </div>
+            <div class="destination-info">
+              <h3>Beaches of Goa</h3>
+              <p>
+                Sun-kissed beaches, vibrant nightlife, and Portuguese heritage.
+              </p>
+              <div class="destination-meta">
+                <span><i class="fas fa-star"></i> 4.6 (3.2k reviews)</span>
+                <span><i class="fas fa-map-marker-alt"></i> Goa</span>
+              </div>
+            </div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-image">
+              <img
+                src="https://images.unsplash.com/photo-1599661046289-e31897846e41?ixlib=rb-4.0.3"
+                alt="Jaipur"
+              />
+            </div>
+            <div class="destination-info">
+              <h3>Jaipur, The Pink City</h3>
+              <p>
+                Majestic palaces, vibrant bazaars, and rich Rajasthani culture.
+              </p>
+              <div class="destination-meta">
+                <span><i class="fas fa-star"></i> 4.7 (1.8k reviews)</span>
+                <span><i class="fas fa-map-marker-alt"></i> Rajasthan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Explore by Category</h2>
+          <p>Find experiences that match your interests</p>
+        </div>
+        <div class="categories-grid">
+          <div class="category-card">
+            <i class="fas fa-mountain"></i>
+            <h3>Mountains</h3>
+            <p>Majestic peaks and serene valleys</p>
+          </div>
+          <div class="category-card">
+            <i class="fas fa-umbrella-beach"></i>
+            <h3>Beaches</h3>
+            <p>Sun, sand, and coastal beauty</p>
+          </div>
+          <div class="category-card">
+            <i class="fas fa-landmark"></i>
+            <h3>Heritage</h3>
+            <p>Historical sites and monuments</p>
+          </div>
+          <div class="category-card">
+            <i class="fas fa-hiking"></i>
+            <h3>Adventure</h3>
+            <p>Thrilling activities and sports</p>
+          </div>
+          <div class="category-card">
+            <i class="fas fa-pray"></i>
+            <h3>Spiritual</h3>
+            <p>Temples, mosques, and sacred sites</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Traveler Stories</h2>
+          <p>Hear from fellow explorers about their Indian adventures</p>
+        </div>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              "My trip to Varanasi was a life-changing experience. The spiritual
+              energy of the ghats and the evening aarti ceremony left me in awe.
+              TripInsight's recommendations were spot on!"
+            </div>
+            <div class="testimonial-author">
+              <img
+                src="https://randomuser.me/api/portraits/women/45.jpg"
+                alt="Sarah Johnson"
+              />
+              <div class="author-info">
+                <h4>Sarah Johnson</h4>
+                <span>Visited Varanasi, April 2023</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              "Kerala's backwaters are truly God's own country. The houseboat
+              stay arranged through TripInsight was exceptional - great food,
+              stunning views, and impeccable service."
+            </div>
+            <div class="testimonial-author">
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Michael Chen"
+              />
+              <div class="author-info">
+                <h4>Michael Chen</h4>
+                <span>Visited Kerala, January 2023</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-content">
+              "Exploring the ancient caves of Ajanta and Ellora was like stepping
+              back in time. The detailed guide provided by TripInsight enhanced
+              our understanding of these magnificent structures."
+            </div>
+            <div class="testimonial-author">
+              <img
+                src="https://randomuser.me/api/portraits/women/68.jpg"
+                alt="Priya Sharma"
+              />
+              <div class="author-info">
+                <h4>Priya Sharma</h4>
+                <span>Visited Maharashtra, March 2023</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-content">
+          <h2>Ready to Begin Your Indian Adventure?</h2>
+          <p>
+            Join thousands of travelers who have discovered the magic of India
+            with TripInsight. Create an account to save favorites, get
+            personalized recommendations, and share your own experiences.
+          </p>
+          <div class="cta-buttons">
+            <a href="#" class="cta-button primary">Sign Up Now</a>
+            <a href="#" class="cta-button secondary">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>About TripInsight</h3>
+            <p>
+              Your trusted companion for exploring the diverse beauty of India.
+            </p>
+          </div>
+          <div class="footer-section">
+            <h3>Popular Destinations</h3>
+            <ul>
+              <li><a href="#">Goa</a></li>
+              <li><a href="#">Rajasthan</a></li>
+              <li><a href="#">Kerala</a></li>
+              <li><a href="#">Himachal Pradesh</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="#">Write a Review</a></li>
+              <li><a href="#">Add a Place</a></li>
+              <li><a href="#">Travel Forum</a></li>
+              <li><a href="#">Help Center</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Connect With Us</h3>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 TripInsight. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

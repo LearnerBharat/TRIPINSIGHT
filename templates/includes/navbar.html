@@ -1,0 +1,21 @@
+<!--
+    Navbar is now dynamically inserted via JavaScript
+    The navbar.js file will create and insert the navbar at the beginning of the body
+    This ensures consistent navbar implementation across all pages
+-->
+
+<script>
+    // Add authentication class to body if user is authenticated
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if user.is_authenticated %}
+            document.body.classList.add('user-authenticated');
+        {% endif %}
+    });
+</script>
+
+<!-- Add authentication class immediately to avoid FOUC (Flash of Unauthenticated Content) -->
+{% if user.is_authenticated %}
+<script>
+    document.body.classList.add('user-authenticated');
+</script>
+{% endif %}

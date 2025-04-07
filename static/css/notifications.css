@@ -1,0 +1,119 @@
+/* Notification Styles */
+.messages-container {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.alert {
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    padding: 14px 28px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    pointer-events: auto;
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.alert i {
+    font-size: 18px;
+}
+
+.alert button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    margin-left: auto;
+    font-size: 18px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.alert button:hover {
+    opacity: 1;
+}
+
+/* Alert Types */
+.alert-success {
+    background-color: var(--success);
+    color: white;
+    border-left: 4px solid #C0EBA6;
+}
+
+.alert-error {
+    background-color: var(--danger);
+    color: white;
+    border-left: 4px solid #ff8a8a;
+}
+
+.alert-info {
+    background-color: var(--primary-dark);
+    color: white;
+    border-left: 4px solid var(--light-accent);
+}
+
+.alert-warning {
+    background-color: var(--warning);
+    color: #212529;
+    border-left: 4px solid #ffdb6d;
+}
+
+/* Animation for alerts */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.alert.fade-in {
+    animation: fadeInDown 0.3s ease forwards;
+}
+
+.alert.fade-out {
+    animation: fadeOutUp 0.3s ease forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .messages-container {
+        top: 70px;
+    }
+    
+    .alert {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}

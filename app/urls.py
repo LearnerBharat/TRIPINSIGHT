@@ -1,0 +1,19 @@
+from django.contrib import admin
+from django.urls import path, include
+from . import views
+urlpatterns = [
+    path('', views.index, name="index"),
+    path('details/<int:pk>/', views.details, name="details"),
+    path('search/', views.search_view, name='search'),
+    path('signup/', views.signup_view, name='signup'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('estimate-cost/', views.estimate_cost, name='estimate-cost'),
+    path('submit-review/<int:pk>/', views.submit_trip_review, name="submit_trip_review"),
+    path('create-profile/', views.create_profile, name="create_profile"),
+    path('profile/', views.profile, name="profile"),
+    path('stories/', views.stories, name="stories"),
+    path('about/', views.about, name="about"),
+    path('explore/', views.explore, name="explore"),
+]
+

@@ -1,0 +1,80 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Stories - TripInsight</title>
+    <meta name="description" content="Discover authentic experiences and inspiring journeys shared by fellow travelers across India. Read travel stories from real travelers.">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/stories.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+  </head>
+  <body>
+    {% include 'includes/notifications.html' %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <h1>Travel Stories</h1>
+        <p>Discover authentic experiences and inspiring journeys shared by fellow travelers across India</p>
+        <a href="#stories" class="btn btn-primary">Read Stories</a>
+      </div>
+    </section>
+
+    <!-- Stories Grid -->
+    <div id="stories" class="container">
+      <div class="stories-grid">
+        {% for i in reviews %}
+        <div class="story-card">
+          <div class="story-content">
+            <div class="story-header">
+              <img
+                src="https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.jpg"
+                alt="User"
+              />
+              <span>{{ i.title }}</span>
+            </div>
+            <div style="margin: 10px 0; font-size: 0.9em; color: #666;">
+              <p><strong>Location:</strong> <a href="/details/{{ i.place.id }}">{{ i.place.Name }}</a></p>
+              <p><strong>Rating:</strong>
+                {% for j in i.rating|times %}
+                <i class="fas fa-star" style="color: gold;"></i>
+                {% endfor %}
+              </p>
+              <p><strong>By:</strong> {{ i.user.username }}</p>
+            </div>
+            <p class="story-description collapsed">{{ i.description }}</p>
+            <button class="read-more">Read More</button>
+            <div class="story-tags">
+              <span>{{ i.place.City }}</span>
+              <span>{{ i.place.State }}</span>
+              <span>{{ i.travel_medium }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+    <script>
+      // Toggle read more/less functionality for story descriptions
+      document.querySelectorAll(".read-more").forEach((button) => {
+        button.addEventListener("click", () => {
+          const description = button.previousElementSibling;
+          description.classList.toggle("collapsed");
+          button.textContent =
+            button.textContent === "Read More" ? "Show Less" : "Read More";
+        });
+      });
+    </script>
+  </body>
+</html>

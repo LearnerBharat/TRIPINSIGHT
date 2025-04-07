@@ -1,0 +1,794 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About TripInsight - Your Travel Companion</title>
+  <link rel="stylesheet" href="{% static 'css/about.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="{% static 'js/navbar.js' %}"></script>
+  
+  <style>
+    :root {
+      --primary-color: #347928;
+      --secondary-color: #C0EBA6;
+      --accent-color: #8FD14F;
+      --light-color: #E8F7DF;
+      --text-color: #333;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --dark-gray: #495057;
+      --border-radius: 8px;
+      --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      --hover-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Hero Section Styles */
+    
+    /* Hero Section */
+    .hero {
+      height: 60vh;
+      min-height: 500px;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)), 
+                  url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3") center/cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding-top: 70px;
+      position: relative;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      padding: 0 20px;
+      z-index: 1;
+    }
+    
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      background: white;
+      padding: 30px 0;
+      margin-top: -50px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      padding: 30px 20px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 1rem;
+      color: var(--dark-gray);
+      font-weight: 500;
+    }
+    
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-header h2:after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 3px;
+      background: var(--primary-color);
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .section-header p {
+      color: var(--dark-gray);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    /* Mission Section */
+    .mission-section {
+      padding: 80px 0;
+      background: var(--light-gray);
+    }
+    
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    
+    .mission-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+    }
+    
+    .mission-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+    
+    .mission-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--light-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 25px;
+      transition: var(--transition);
+    }
+    
+    .mission-card:hover .mission-icon {
+      background: var(--primary-color);
+    }
+    
+    .mission-icon i {
+      font-size: 36px;
+      color: var(--primary-color);
+      transition: var(--transition);
+    }
+    
+    .mission-card:hover .mission-icon i {
+      color: white;
+    }
+    
+    .mission-card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--text-color);
+    }
+    
+    .mission-card p {
+      color: var(--dark-gray);
+      font-size: 1rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+      padding: 80px 0;
+      background: white;
+    }
+    
+    .features-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+    
+    .features-image {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+    
+    .features-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+    }
+    
+    .features-content {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .feature-item {
+      margin-bottom: 30px;
+      display: flex;
+      gap: 20px;
+    }
+    
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--light-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .feature-icon i {
+      font-size: 20px;
+      color: var(--primary-color);
+    }
+    
+    .feature-text h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-color);
+    }
+    
+    .feature-text p {
+      color: var(--dark-gray);
+      font-size: 0.95rem;
+    }
+    
+    /* Team Section */
+    .team-section {
+      padding: 80px 0;
+      background: var(--light-gray);
+    }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    
+    .team-card {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+    }
+    
+    .team-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+    
+    .team-image {
+      height: 280px;
+      overflow: hidden;
+    }
+    
+    .team-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .team-card:hover .team-image img {
+      transform: scale(1.05);
+    }
+    
+    .team-info {
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .team-info h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text-color);
+    }
+    
+    .team-info .position {
+      display: block;
+      font-size: 1rem;
+      color: var(--primary-color);
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+    
+    .team-info p {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    
+    .team-social {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .team-social a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: var(--light-gray);
+      border-radius: 50%;
+      color: var(--primary-color);
+      transition: var(--transition);
+    }
+    
+    .team-social a:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-3px);
+    }
+    
+    /* Connect Section */
+    .connect-section {
+      padding: 100px 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)), 
+                  url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3') center/cover;
+      color: white;
+      text-align: center;
+    }
+    
+    .connect-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .connect-content h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .connect-content p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .social-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    
+    .social-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 25px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(5px);
+      border-radius: var(--border-radius);
+      color: white;
+      transition: var(--transition);
+    }
+    
+    .social-card:hover {
+      background: var(--primary-color);
+      transform: translateY(-5px);
+    }
+    
+    .social-card i {
+      font-size: 1.2rem;
+    }
+    
+
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+      
+      .stats-container {
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      
+      .stat-item {
+        width: 45%;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .hero {
+        height: 50vh;
+      }
+      
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      
+      .hero p {
+        font-size: 1rem;
+      }
+      
+      .stats-container {
+        flex-direction: column;
+        gap: 30px;
+      }
+      
+      .stat-item {
+        width: 100%;
+      }
+      
+      .section-header h2 {
+        font-size: 2rem;
+      }
+      
+      .features-container {
+        flex-direction: column;
+      }
+      
+      .features-image {
+        order: 2;
+      }
+      
+      .features-content {
+        order: 1;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      
+      .mission-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .social-grid {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'includes/navbar.html' %}
+
+  <!-- Mobile Menu Toggle (for smaller screens) -->
+  <div class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  {% include 'includes/notifications.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Discover the Heart of India</h1>
+      <p>Your trusted companion in exploring the diverse beauty and rich cultural heritage of incredible India</p>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-container">
+        <div class="stat-item">
+          <span class="stat-number">10M+</span>
+          <span class="stat-label">Monthly Visitors</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">500K+</span>
+          <span class="stat-label">Verified Reviews</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">1000+</span>
+          <span class="stat-label">Destinations</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">Customer Support</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="mission-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Mission</h2>
+        <p>Empowering travelers to explore India's wonders with confidence and authenticity</p>
+      </div>
+      
+      <div class="mission-grid">
+        <div class="mission-card">
+          <div class="mission-icon">
+            <i class="fas fa-compass"></i>
+          </div>
+          <h3>Authentic Experiences</h3>
+          <p>We curate genuine travel experiences that showcase India's diverse culture and heritage, connecting travelers with the true essence of each destination.</p>
+        </div>
+        
+        <div class="mission-card">
+          <div class="mission-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Community First</h3>
+          <p>We're building a trusted community of passionate travelers sharing real insights and experiences to help others discover the best of India.</p>
+        </div>
+        
+        <div class="mission-card">
+          <div class="mission-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>Reliable Information</h3>
+          <p>We provide verified and up-to-date travel information you can trust, ensuring your journey is smooth, safe, and memorable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose Us</h2>
+        <p>Experience travel planning like never before with our unique features</p>
+      </div>
+      
+      <div class="features-container">
+        <div class="features-image">
+          <img src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?ixlib=rb-4.0.3" alt="Travel Planning">
+        </div>
+        
+        <div class="features-content">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="feature-text">
+              <h3>Expert Reviews</h3>
+              <p>Access in-depth reviews from experienced travelers and local experts who provide authentic insights about destinations across India.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-route"></i>
+            </div>
+            <div class="feature-text">
+              <h3>Smart Planning</h3>
+              <p>Use our intelligent tools to help you plan the perfect trip, from customized itineraries to budget calculators and packing lists.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="feature-text">
+              <h3>Local Insights</h3>
+              <p>Discover hidden gems and authentic experiences with our deep local knowledge and cultural understanding of each destination.</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-hand-holding-heart"></i>
+            </div>
+            <div class="feature-text">
+              <h3>Responsible Tourism</h3>
+              <p>We promote sustainable and responsible travel practices that respect local communities and preserve India's natural beauty.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Meet Our Team</h2>
+        <p>The passionate minds behind your travel experiences</p>
+      </div>
+      
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-image">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bharat Sharma">
+          </div>
+          <div class="team-info">
+            <h3>Bharat Sharma</h3>
+            <span class="position">Backend Developer</span>
+            <p>Built the TripInsight platform from the ground up, focusing on performance and user experience.</p>
+            <div class="team-social">
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-image">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Shrushti Sabale">
+          </div>
+          <div class="team-info">
+            <h3>Shrushti Sabale</h3>
+            <span class="position">Social Media Executive</span>
+            <p>Crafts engaging strategies that connect travelers with authentic Indian experiences.</p>
+            <div class="team-social">
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-image">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Vedant Salunkhe">
+          </div>
+          <div class="team-info">
+            <h3>Vedant Salunkhe</h3>
+            <span class="position">Data Operations</span>
+            <p>Manages analytics and integration to ensure accurate and up-to-date travel information.</p>
+            <div class="team-social">
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-image">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rohit Shinde">
+          </div>
+          <div class="team-info">
+            <h3>Rohit Shinde</h3>
+            <span class="position">UI/UX Designer</span>
+            <p>Creates intuitive and visually appealing interfaces that enhance the user experience across all platforms.</p>
+            <div class="team-social">
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-dribbble"></i></a>
+              <a href="#"><i class="fab fa-behance"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Connect Section -->
+  <section class="connect-section">
+    <div class="container">
+      <div class="connect-content">
+        <h2>Connect With Us</h2>
+        <p>Follow us on social media for travel inspiration, tips, and updates</p>
+        <div class="social-grid">
+          <a href="#" class="social-card">
+            <i class="fab fa-facebook-f"></i>
+            <span>Facebook</span>
+          </a>
+          <a href="#" class="social-card">
+            <i class="fab fa-twitter"></i>
+            <span>Twitter</span>
+          </a>
+          <a href="#" class="social-card">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+          </a>
+          <a href="#" class="social-card">
+            <i class="fab fa-youtube"></i>
+            <span>YouTube</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate elements on scroll
+      const animateElements = document.querySelectorAll('.mission-card, .team-card, .feature-item');
+      
+      // Set initial state
+      animateElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      });
+      
+      function checkScroll() {
+        animateElements.forEach(el => {
+          const elementTop = el.getBoundingClientRect().top;
+          const elementVisible = 150;
+          
+          if (elementTop < window.innerHeight - elementVisible) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }
+        });
+      }
+      
+      // Run on page load
+      checkScroll();
+      
+      // Run on scroll
+      window.addEventListener('scroll', checkScroll);
+    });
+  </script>
+
+  {% include 'includes/footer.html' %}
+</body>
+</html>

@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TripInsight</title>
+    <meta name="description" content="Login to your TripInsight account to explore the diverse beauty of India, plan your trips, and share your experiences.">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+
+    <style>
+        body {
+            background-color: var(--light-gray);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+      .login-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 0;
+      }
+
+      .login-container {
+        background: white;
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        position: relative;
+        transition: var(--transition);
+      }
+
+      .login-container:hover {
+        box-shadow: var(--hover-shadow);
+      }
+
+      .login-header {
+        margin-bottom: 30px;
+      }
+
+      .login-header h1 {
+        font-size: 2.2rem;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+      }
+
+      .login-header p {
+        color: var(--dark-gray);
+        font-size: 1rem;
+        margin-bottom: 0;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--secondary-color);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 121, 40, 0.1);
+      }
+
+      .forgot-password {
+        display: block;
+        text-align: right;
+        margin: 8px 0 25px;
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: var(--transition);
+      }
+
+      .forgot-password a {
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      .forgot-password a:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+      }
+
+      .form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-check input {
+        margin-right: 8px;
+      }
+
+      .form-check label {
+        font-size: 0.9rem;
+        color: var(--dark-gray);
+      }
+
+      .login-button {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: var(--transition);
+        margin-bottom: 25px;
+      }
+
+      .login-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+
+      .login-button:active {
+        transform: translateY(0);
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        margin: 25px 0;
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--medium-gray);
+      }
+
+      .divider span {
+        padding: 0 15px;
+      }
+
+      .social-login {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 25px;
+      }
+
+      .social-login-button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--medium-gray);
+        background: white;
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+      }
+
+      .social-login-button:hover {
+        background: var(--light-gray);
+        transform: translateY(-2px);
+      }
+
+      .social-login-button i {
+        font-size: 18px;
+      }
+
+      .google-login i {
+        color: #DB4437;
+      }
+
+      .facebook-login i {
+        color: #4267B2;
+      }
+
+      .login-footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--light-gray);
+        font-size: 0.9rem;
+        color: var(--dark-gray);
+      }
+
+      .login-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .login-footer a:hover {
+        text-decoration: underline;
+      }
+
+      .alert {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      .alert-danger {
+        background-color: var(--error-bg, #f8d7da);
+        color: var(--error-text, #721c24);
+        border: 1px solid #f5c6cb;
+      }
+
+      .alert-success {
+        background-color: var(--success-bg, #d4edda);
+        color: var(--success-text, #155724);
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-info {
+        background-color: var(--info-bg, #d1ecf1);
+        color: var(--info-text, #0c5460);
+        border: 1px solid #bee5eb;
+      }
+
+      .alert-warning {
+        background-color: var(--warning-bg, #fff3cd);
+        color: var(--warning-text, #856404);
+        border: 1px solid #ffeeba;
+      }
+
+      @media (max-width: 576px) {
+        .login-container {
+          padding: 30px 20px;
+        }
+
+        .login-header h1 {
+          font-size: 1.8rem;
+        }
+
+        .social-login {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'includes/navbar.html' %}
+    {% include 'includes/notifications.html' %}
+
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <i class="fas fa-user-circle brand-icon" style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <h1>Welcome Back</h1>
+                    <p>Enter your credentials to access your account</p>
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <form class="login-form" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" value="{{ username }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                        <div class="forgot-password">
+                            <a href="#">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+
+                    <button type="submit" class="login-button">Login</button>
+                </form>
+
+                <div class="divider"><span>or continue with</span></div>
+
+                <div class="social-login">
+                    <a href="#" class="social-login-button google-login">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </a>
+                    <a href="#" class="social-login-button facebook-login">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Facebook</span>
+                    </a>
+                </div>
+
+                <div class="login-footer">
+                    <p>Don't have an account? <a href="/signup">Sign up</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <script>
+      // Add authentication class to body if user is authenticated
+      document.addEventListener('DOMContentLoaded', function() {
+        {% if user.is_authenticated %}
+          document.body.classList.add('user-authenticated');
+        {% endif %}
+      });
+    </script>
+  </body>
+</html>

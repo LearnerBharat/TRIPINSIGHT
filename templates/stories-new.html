@@ -1,0 +1,670 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Stories - TripInsight</title>
+  <link rel="stylesheet" href="{% static 'css/stories.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="{% static 'js/navbar.js' %}"></script>
+  
+  <style>
+    :root {
+      --primary-color: #347928;
+      --secondary-color: #C0EBA6;
+      --accent-color: #8FD14F;
+      --light-color: #E8F7DF;
+      --text-color: #333;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --dark-gray: #495057;
+      --border-radius: 8px;
+      --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      --hover-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Hero Section Styles */
+    
+    /* Hero Section */
+    .hero {
+      height: 60vh;
+      min-height: 450px;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)),
+                  url('https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding-top: 70px;
+      position: relative;
+      background-attachment: fixed;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      padding: 0 20px;
+      z-index: 1;
+    }
+    
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero h1:after {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 4px;
+      background: var(--primary-color);
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 30px;
+      opacity: 0.9;
+    }
+    
+    /* Stories Section */
+    .stories-section {
+      padding: 80px 0;
+      background: var(--light-gray);
+    }
+
+    .stories-section .container {
+      max-width: 1400px;
+    }
+
+    .stories-section .container {
+      max-width: 1400px;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .section-header:before {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-color: var(--light-color);
+      border-radius: 50%;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .section-header h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+      z-index: 1;
+    }
+
+    .section-header h2:after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 4px;
+      background: var(--primary-color);
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .section-header p {
+      color: var(--dark-gray);
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Stories Grid */
+    .stories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+    
+    .story-card {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--medium-gray);
+      max-width: 100%;
+      position: relative;
+      padding-top: 15px;
+    }
+
+
+    
+    .story-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+    
+    .story-header {
+      padding: 10px 25px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid var(--light-color);
+      padding-bottom: 15px;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .story-header img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--light-color);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .story-card:hover .story-header img {
+      transform: scale(1.05);
+    }
+    
+    .story-header-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+
+    .story-card:hover .story-header-info h3 {
+      color: var(--primary-color);
+    }
+
+    .story-header-info span {
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .story-header-info span i {
+      color: var(--primary-color);
+      font-size: 0.8rem;
+    }
+    
+    .story-content {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .story-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+      background-color: var(--light-gray);
+      padding: 12px 15px;
+      border-radius: var(--border-radius);
+      margin-top: 5px;
+    }
+
+    .story-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .story-meta-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .story-meta-item i {
+      color: var(--primary-color);
+      font-size: 0.9rem;
+    }
+    
+    .story-meta-item a {
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .story-meta-item a:hover {
+      color: var(--secondary-color);
+    }
+    
+    .story-description {
+      color: var(--text-color);
+      font-size: 1rem;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+      max-height: 100px;
+      transition: max-height 0.5s ease;
+      line-height: 1.7;
+      padding: 5px 0;
+    }
+
+    .story-description.expanded {
+      max-height: 1000px;
+    }
+
+    .story-description:not(.expanded)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(transparent, white);
+    }
+
+    .read-more {
+      align-self: flex-start;
+      background: var(--light-color);
+      border: none;
+      color: var(--primary-color);
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 15px;
+      font-family: 'Poppins', sans-serif;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .read-more:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .read-more:after {
+      content: '→';
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .read-more:hover:after {
+      transform: translateX(3px);
+    }
+    
+    .story-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 15px;
+      border-top: 1px solid var(--light-color);
+    }
+
+    .story-tag {
+      background: var(--light-color);
+      color: var(--primary-color);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .story-tag:before {
+      content: '#';
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .story-tag:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .story-tag:hover:before {
+      color: white;
+    }
+    
+    /* Rating Stars */
+    .rating-stars {
+      color: #FFD700;
+      margin-left: 5px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .rating-stars i {
+      margin-right: 2px;
+    }
+    
+    /* Share Story Section */
+    .share-story-section {
+      padding: 100px 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3)), 
+                  url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?ixlib=rb-4.0.3') center/cover;
+      color: white;
+      text-align: center;
+    }
+    
+    .share-story-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .share-story-content h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .share-story-content p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .share-story-button {
+      display: inline-block;
+      padding: 15px 30px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .share-story-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-5px);
+    }
+    
+
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        height: 40vh;
+        background-attachment: scroll;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .stories-grid {
+        grid-template-columns: 1fr;
+        padding: 0 15px;
+      }
+
+      .section-header h2 {
+        font-size: 2.2rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero h1:after {
+        width: 70px;
+      }
+
+      .story-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 15px 0;
+      }
+
+      .story-meta {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+
+      .story-content {
+        padding: 20px 15px;
+      }
+
+      .read-more {
+        align-self: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'includes/navbar.html' %}
+
+  <!-- Mobile Menu Toggle (for smaller screens) -->
+  <div class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  {% include 'includes/notifications.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Travel Stories</h1>
+      <p>Authentic experiences and insights from fellow travelers exploring the wonders of India</p>
+    </div>
+  </section>
+
+  <!-- Stories Section -->
+  <section class="stories-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Traveler Experiences</h2>
+        <p>Read about real adventures and discoveries from our community of passionate travelers</p>
+      </div>
+      
+      <div class="stories-grid">
+        {% for i in reviews %}
+        <div class="story-card">
+          <div class="story-header">
+            <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="User Avatar">
+            <div class="story-header-info">
+              <h3>{{ i.title }}</h3>
+              <span><i class="fas fa-user-circle"></i> By {{ i.user.username }}</span>
+            </div>
+          </div>
+
+          <div class="story-content">
+            <div class="story-meta">
+              <div class="story-meta-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Location: <a href="/details/{{ i.place.id }}">{{ i.place.Name }}</a></span>
+              </div>
+
+              <div class="story-meta-item">
+                <i class="fas fa-star"></i>
+                <span>Rating:
+                  <span class="rating-stars">
+                    {% for j in i.rating|times %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                  </span>
+                </span>
+              </div>
+
+              <div class="story-meta-item">
+                <i class="fas fa-route"></i>
+                <span>Travel: {{ i.travel_medium }}</span>
+              </div>
+
+              <div class="story-meta-item">
+                <i class="fas fa-users"></i>
+                <span>Group Size: {{ i.no_of_people }} people</span>
+              </div>
+            </div>
+
+            <p class="story-description">{{ i.description }}</p>
+            <button class="read-more">Read More</button>
+
+            <div class="story-tags">
+              <span class="story-tag">{{ i.place.City }}</span>
+              <span class="story-tag">{{ i.place.State }}</span>
+              <span class="story-tag">{{ i.travel_medium }}</span>
+              {% if i.place.Type %}
+              <span class="story-tag">{{ i.place.Type }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Share Your Story Section -->
+  <section class="share-story-section">
+    <div class="container">
+      <div class="share-story-content">
+        <h2>Share Your Travel Story</h2>
+        <p>Had an amazing experience exploring India? Share your journey with our community and inspire fellow travelers</p>
+        <a href="/profile" class="share-story-button">Share Your Story</a>
+      </div>
+    </div>
+  </section>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Read More functionality
+      const readMoreButtons = document.querySelectorAll('.read-more');
+      
+      readMoreButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const description = this.previousElementSibling;
+          description.classList.toggle('expanded');
+          this.textContent = description.classList.contains('expanded') ? 'Show Less' : 'Read More';
+        });
+      });
+      
+      // Animate elements on scroll
+      const animateElements = document.querySelectorAll('.story-card');
+      
+      // Set initial state
+      animateElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      });
+      
+      function checkScroll() {
+        animateElements.forEach(el => {
+          const elementTop = el.getBoundingClientRect().top;
+          const elementVisible = 150;
+          
+          if (elementTop < window.innerHeight - elementVisible) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }
+        });
+      }
+      
+      // Run on page load
+      checkScroll();
+      
+      // Run on scroll
+      window.addEventListener('scroll', checkScroll);
+    });
+  </script>
+
+  {% include 'includes/footer.html' %}
+</body>
+</html>

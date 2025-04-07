@@ -1,0 +1,265 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - TripInsight</title>
+    <meta name="description" content="Create your TripInsight account to explore the diverse beauty of India, plan your trips, and share your experiences.">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+
+    <style>
+        body {
+            background-color: var(--light-gray);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+      .signup-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 0;
+      }
+
+      .signup-container {
+        background: white;
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        position: relative;
+        transition: var(--transition);
+      }
+
+      .signup-container:hover {
+        box-shadow: var(--hover-shadow);
+      }
+
+      .signup-header {
+        margin-bottom: 30px;
+      }
+
+      .signup-header h1 {
+        font-size: 2.2rem;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+      }
+
+      .signup-header p {
+        color: var(--dark-gray);
+        font-size: 1rem;
+        margin-bottom: 0;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--secondary-color);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 121, 40, 0.1);
+      }
+
+      .signup-button {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: var(--transition);
+        margin-bottom: 25px;
+      }
+
+      .signup-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+
+      .signup-button:active {
+        transform: translateY(0);
+      }
+
+      .terms-text {
+        font-size: 0.85rem;
+        color: var(--dark-gray);
+        text-align: center;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .terms-text a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .terms-text a:hover {
+        text-decoration: underline;
+      }
+
+      .login-link {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--light-gray);
+        font-size: 0.9rem;
+        color: var(--dark-gray);
+      }
+
+      .login-link a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      .alert {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      .alert-danger {
+        background-color: var(--error-bg, #f8d7da);
+        color: var(--error-text, #721c24);
+        border: 1px solid #f5c6cb;
+      }
+
+      .alert-success {
+        background-color: var(--success-bg, #d4edda);
+        color: var(--success-text, #155724);
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-info {
+        background-color: var(--info-bg, #d1ecf1);
+        color: var(--info-text, #0c5460);
+        border: 1px solid #bee5eb;
+      }
+
+      .alert-warning {
+        background-color: var(--warning-bg, #fff3cd);
+        color: var(--warning-text, #856404);
+        border: 1px solid #ffeeba;
+      }
+
+      @media (max-width: 576px) {
+        .signup-container {
+          padding: 30px 20px;
+        }
+
+        .signup-header h1 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'includes/navbar.html' %}
+    {% include 'includes/notifications.html' %}
+
+    <section class="signup-section">
+        <div class="container">
+            <div class="signup-container">
+                <div class="signup-header">
+                    <i class="fas fa-user-plus" style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <h1>Create Your Account</h1>
+                    <p>Join TripInsight to explore the diverse beauty of India</p>
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <form class="signup-form" method="post" action="{% url 'signup' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" value="{{ username }}" placeholder="Choose a username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" value="{{ email }}" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password1">Password</label>
+                        <input type="password" id="password1" name="password1" class="form-control" placeholder="Create a password (min. 8 characters)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password2">Confirm Password</label>
+                        <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+
+                    <button type="submit" class="signup-button">Create Account</button>
+                </form>
+
+                <div class="terms-text">
+                    <p>By creating an account, you agree to our <a href="#">Terms of Service</a> and acknowledge our <a href="#">Privacy Policy</a>.</p>
+                </div>
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="/login">Log in</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <script>
+      // Add authentication class to body if user is authenticated
+      document.addEventListener('DOMContentLoaded', function() {
+        {% if user.is_authenticated %}
+          document.body.classList.add('user-authenticated');
+        {% endif %}
+      });
+    </script>
+  </body>
+</html>

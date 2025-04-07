@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Your Profile - TripInsight</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #508D4E;
+        --secondary-color: #1A5319;
+        --accent-color: #80AF81;
+        --light-color: #D6EFD8;
+        --text-color: #2c3e50;
+        --light-gray: #f2f2f2;
+        --border-radius: 8px;
+        --error-bg: #f8d7da;
+        --error-text: #721c24;
+        --success-bg: #d4edda;
+        --success-text: #155724;
+        --info-bg: #d1ecf1;
+        --info-text: #0c5460;
+        --warning-bg: #fff3cd;
+        --warning-text: #856404;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background-color: var(--light-gray);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .container {
+        width: 100%;
+        max-width: 600px;
+      }
+      .profile-form {
+        background: white;
+        padding: 40px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .form-header i {
+        font-size: 48px;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+      }
+      .form-header h1 {
+        color: var(--text-color);
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+      .form-header p {
+        color: #7f8c8d;
+        font-size: 16px;
+      }
+      .form-group {
+        margin-bottom: 24px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+      .form-group label i {
+        margin-right: 8px;
+        color: var(--primary-color);
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(51, 162, 92, 0.1);
+      }
+      .form-group textarea {
+        height: 120px;
+        resize: vertical;
+      }
+      button {
+        width: 100%;
+        padding: 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(51, 162, 92, 0.2);
+      }
+      button i {
+        font-size: 18px;
+      }
+      @media (max-width: 600px) {
+        .profile-form {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form class="profile-form" method="post">
+        {% csrf_token %}
+        <div class="form-header">
+          <i class="fa-solid fa-user-circle"></i>
+          <h1>Create Your Profile</h1>
+          <p>Tell us about yourself</p>
+        </div>
+
+        {% if messages %}
+        <ul class="messages" style="list-style-type: none; padding: 0; margin-bottom: 20px;">
+          {% for message in messages %}
+          <li class="{{ message.tags }}" style="padding: 10px; margin-bottom: 10px; border-radius: 5px;
+          {% if message.tags == 'success' %}background-color: var(--success-bg); color: var(--success-text); border: 1px solid #c3e6cb;{% endif %}
+          {% if message.tags == 'error' %}background-color: var(--error-bg); color: var(--error-text); border: 1px solid #f5c6cb;{% endif %}
+          {% if message.tags == 'info' %}background-color: var(--info-bg); color: var(--info-text); border: 1px solid #bee5eb;{% endif %}
+          {% if message.tags == 'warning' %}background-color: var(--warning-bg); color: var(--warning-text); border: 1px solid #ffeeba;{% endif %}
+          ">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="form-group">
+          <label for="name">
+            <i class="fa-solid fa-user"></i>
+            Full Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your full name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="description">
+            <i class="fa-solid fa-comment-dots"></i>
+            About Me
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Tell us about yourself..."
+            required
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="state">
+            <i class="fa-solid fa-map-marker-alt"></i>
+            State
+          </label>
+          <select id="state" name="state" required>
+            <option value="">Select your state</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Assam">Assam</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Madhya Pradesh">Madhya Pradesh</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+          </select>
+        </div>
+        <button type="submit">
+          <i class="fa-solid fa-check-circle"></i>
+          Create Profile
+        </button>
+      </form>
+    </div>
+  </body>
+</html>

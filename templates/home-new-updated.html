@@ -1,0 +1,879 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripInsight - Discover Incredible India</title>
+  <meta name="description" content="Explore the diverse beauty of India with TripInsight. Find destinations, read travel stories, and plan your perfect trip.">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="{% static 'js/navbar.js' %}" defer></script>
+
+  <style>
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      min-height: 600px;
+      background: linear-gradient(to right, rgba(31, 69, 41, 0.8), rgba(52, 121, 40, 0.4)),
+                  url('https://images.unsplash.com/photo-1598091383021-15ddea10925d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      position: relative;
+      margin-top: -80px; /* Compensate for fixed navbar */
+      padding-top: 80px;
+    }
+
+    .hero-content {
+      max-width: 1000px;
+      padding: 0 20px;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 4.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      color: white;
+    }
+
+    .hero p {
+      font-size: 1.4rem;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Search Container */
+    .search-container {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--light-gray);
+      border-radius: var(--border-radius);
+      padding: 0 15px;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+
+    .search-input:focus-within {
+      box-shadow: 0 0 0 2px var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .search-input i {
+      color: var(--primary-color);
+      font-size: 18px;
+    }
+
+    .search-input input {
+      border: none;
+      background: transparent;
+      padding: 15px;
+      width: 100%;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .search-input input:focus {
+      outline: none;
+    }
+
+    .filter-toggle {
+      background: var(--light-gray);
+      color: var(--text-color);
+      border: none;
+      padding: 0 20px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .filter-toggle:hover {
+      background: var(--medium-gray);
+    }
+
+    .search-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0 25px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .search-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .search-filters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .search-filters.show {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--medium-gray);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dark-gray);
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      color: var(--text-color);
+      background-color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(52, 121, 40, 0.1);
+    }
+
+    /* Featured Destinations Section */
+    .featured-destinations {
+      padding: 100px 0;
+      background: white;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-header p {
+      color: var(--dark-gray);
+      font-size: 1.1rem;
+      max-width: 800px;
+      margin: 20px auto 0;
+    }
+
+    .destination-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 25px;
+    }
+
+    .destination-card {
+      position: relative;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+    }
+
+    .destination-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .destination-card.large {
+      grid-column: span 8;
+      grid-row: span 1;
+      height: 450px;
+    }
+
+    .destination-card:not(.large) {
+      grid-column: span 4;
+      height: 450px;
+    }
+
+    .destination-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .destination-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 30px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2), transparent);
+      color: white;
+    }
+
+    .card-content h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: white;
+    }
+
+    .card-content p {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+
+    .card-content .btn {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease 0.1s;
+    }
+
+    .destination-card:hover .card-content .btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Top Places Section */
+    .top-places {
+      padding: 100px 0;
+      background: var(--lightest-color);
+      position: relative;
+    }
+
+    .top-places::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to bottom right, white 0%, white 50%, var(--lightest-color) 50%, var(--lightest-color) 100%);
+    }
+
+    .places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+    }
+
+    .place-card {
+      background: white;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .place-img {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .place-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .place-card:hover .place-img img {
+      transform: scale(1.1);
+    }
+
+    .place-tag {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--primary-color);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .place-details {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place-details h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+      transition: var(--transition);
+    }
+
+    .place-card:hover .place-details h3 {
+      color: var(--primary-color);
+    }
+
+    .place-details p {
+      color: var(--dark-gray);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    .place-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 15px;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .place-location {
+      color: var(--accent-color);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .place-location i {
+      color: var(--primary-color);
+      margin-right: 5px;
+    }
+
+    .place-link {
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.95rem;
+    }
+
+    .place-link:hover {
+      color: var(--secondary-color);
+    }
+
+    .place-link i {
+      transition: transform 0.3s ease;
+    }
+
+    .place-link:hover i {
+      transform: translateX(3px);
+    }
+
+    /* Features Section */
+    .features-section {
+      padding: 100px 0;
+      background: white;
+      position: relative;
+    }
+
+    .features-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to bottom left, var(--lightest-color) 0%, var(--lightest-color) 50%, white 50%, white 100%);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 30px;
+    }
+
+    .feature-card {
+      text-align: center;
+      padding: 40px 30px;
+      border-radius: var(--border-radius);
+      background: white;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--lightest-color);
+      color: var(--primary-color);
+      border-radius: 50%;
+      font-size: 32px;
+    }
+
+    .feature-card:hover .feature-icon {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .feature-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: var(--secondary-color);
+    }
+
+    .feature-card p {
+      color: var(--dark-gray);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Call to Action Section */
+    .cta-section {
+      padding: 120px 0;
+      background: linear-gradient(to right, rgba(31, 69, 41, 0.85), rgba(71, 102, 59, 0.85)),
+                  url('https://images.unsplash.com/photo-1506461883276-594a12b11cf3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+
+    .cta-content {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-content h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .cta-content p {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 15px 30px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+      min-width: 180px;
+    }
+
+    .cta-button.outline {
+      background: transparent;
+      border: 2px solid white;
+    }
+
+    .cta-button:hover {
+      background: var(--secondary-color);
+      transform: translateY(-5px);
+    }
+
+    .cta-button.outline:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .container {
+        max-width: 1140px;
+      }
+      
+      .destination-card.large, 
+      .destination-card:not(.large) {
+        height: 400px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .container {
+        max-width: 960px;
+      }
+      
+      .hero h1 {
+        font-size: 3.5rem;
+      }
+
+      .destination-card.large {
+        grid-column: span 12;
+      }
+
+      .destination-card:not(.large) {
+        grid-column: span 6;
+      }
+      
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        max-width: 720px;
+      }
+      
+      .hero {
+        height: auto;
+        min-height: 100vh;
+        padding: 120px 0 60px;
+      }
+
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-filters {
+        grid-template-columns: 1fr;
+      }
+
+      .destination-card:not(.large) {
+        grid-column: span 12;
+      }
+
+      .places-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+      
+      .cta-content h2 {
+        font-size: 2.4rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        max-width: 100%;
+        padding: 0 15px;
+      }
+      
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .section-header h2 {
+        font-size: 2rem;
+      }
+
+      .places-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-content h2 {
+        font-size: 2rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .destination-card.large, 
+      .destination-card:not(.large) {
+        height: 350px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'includes/navbar.html' %}
+  {% include 'includes/notifications.html' %}
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Discover Incredible India</h1>
+      <p>From the majestic Himalayas to serene backwaters, experience the diverse landscapes, rich culture, and vibrant heritage of India with TripInsight</p>
+      
+      <!-- Search Container -->
+      <div class="search-container">
+        <form action="/search/" method="GET" id="search-form">
+          <div class="search-box">
+            <div class="search-input">
+              <i class="fas fa-search"></i>
+              <input type="text" name="q" placeholder="Where would you like to go?">
+            </div>
+            <button type="button" class="filter-toggle">
+              <i class="fas fa-sliders-h"></i>
+              Filters
+            </button>
+            <button type="submit" class="search-button">
+              <i class="fas fa-search"></i>
+              Search
+            </button>
+          </div>
+
+          <div class="search-filters">
+            <div class="filter-group">
+              <label for="destination-type">Destination Type</label>
+              <select id="destination-type" name="type">
+                <option value="">All Types</option>
+                <option value="Beach">Beaches</option>
+                <option value="Mountain">Mountains</option>
+                <option value="Heritage">Heritage Sites</option>
+                <option value="Wildlife">Wildlife</option>
+                <option value="Pilgrimage">Pilgrimage</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="state">State</label>
+              <select id="state" name="state">
+                <option value="">All States</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Goa">Goa</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="budget">Budget Range</label>
+              <select id="budget">
+                <option value="">Any Budget</option>
+                <option value="budget">Budget Friendly</option>
+                <option value="mid-range">Mid Range</option>
+                <option value="luxury">Luxury</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="duration">Duration</label>
+              <select id="duration">
+                <option value="">Any Duration</option>
+                <option value="weekend">Weekend Getaway (1-3 days)</option>
+                <option value="short">Short Trip (4-7 days)</option>
+                <option value="long">Extended Trip (8+ days)</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Destinations Section -->
+  <section class="featured-destinations">
+    <div class="container">
+      <div class="section-header">
+        <h2>Featured Destinations</h2>
+        <p>Explore India's most breathtaking and popular destinations that showcase the country's diverse beauty</p>
+      </div>
+      
+      <div class="destination-grid">
+        <div class="destination-card large">
+          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Taj Mahal">
+          <div class="card-content">
+            <h3>Taj Mahal, Agra</h3>
+            <p>Marvel at the iconic symbol of eternal love, a UNESCO World Heritage site and one of the Seven Wonders of the World.</p>
+            <a href="/search/?q=Taj+Mahal" class="btn btn-primary">Explore Now</a>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Jaipur">
+          <div class="card-content">
+            <h3>Jaipur, Rajasthan</h3>
+            <p>Explore the Pink City with its magnificent palaces and vibrant culture.</p>
+            <a href="/search/?q=Jaipur" class="btn btn-primary">Explore Now</a>
+          </div>
+        </div>
+
+        <div class="destination-card">
+          <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Varanasi">
+          <div class="card-content">
+            <h3>Varanasi, Uttar Pradesh</h3>
+            <p>Experience the spiritual heart of India on the banks of the sacred Ganges River.</p>
+            <a href="/search/?q=Varanasi" class="btn btn-primary">Explore Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose TripInsight</h2>
+        <p>Discover what makes us the perfect companion for your Indian adventure</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3>Curated Destinations</h3>
+          <p>Discover handpicked destinations across India, from popular tourist spots to hidden gems known only to locals.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <h3>Authentic Reviews</h3>
+          <p>Read genuine reviews and experiences shared by fellow travelers to help plan your perfect trip.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-rupee-sign"></i>
+          </div>
+          <h3>Budget Planning</h3>
+          <p>Get accurate cost estimates for accommodation, travel, and food to help you plan your trip within your budget.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Places Section -->
+  <section class="top-places">
+    <div class="container">
+      <div class="section-header">
+        <h2>Top Places to Visit</h2>
+        <p>Discover the most popular and highly-rated destinations across India</p>
+      </div>
+      
+      <div class="places-grid">
+        {% for place in places %}
+        <div class="place-card">
+          <div class="place-img">
+            <img src="{{ place.Image_url }}" alt="{{ place.Name }}">
+            <div class="place-tag">{{ place.Type }}</div>
+          </div>
+          <div class="place-details">
+            <h3>{{ place.Name }}</h3>
+            <p>{{ place.Description|truncatechars:120 }}</p>
+            <div class="place-footer">
+              <div class="place-location">
+                <i class="fas fa-map-marker-alt"></i> {{ place.City }}, {{ place.State }}
+              </div>
+              <a href="/details/{{ place.id }}" class="place-link">
+                Explore <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Start Your Journey?</h2>
+        <p>Join our community of travelers and share your experiences or find inspiration for your next adventure</p>
+        <div class="cta-buttons">
+          <a href="/stories" class="cta-button">Explore Stories</a>
+          <a href="/explore" class="cta-button outline">Discover Destinations</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% include 'includes/footer.html' %}
+</body>
+</html>

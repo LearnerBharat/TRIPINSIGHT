@@ -1,0 +1,191 @@
+<!-- Simple Footer for TripInsight -->
+<footer class="simple-footer">
+    <div class="footer-container">
+        <!-- Main Footer Content -->
+        <div class="footer-columns">
+            <!-- Brand Column -->
+            <div class="footer-column">
+                <div class="footer-logo">
+                    <i class="fas fa-compass"></i>
+                    <span>TripInsight</span>
+                </div>
+                <p>Your trusted companion for exploring the diverse beauty and rich cultural heritage of incredible India.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Links Columns -->
+            <div class="footer-column">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/explore">Destinations</a></li>
+                    <li><a href="/stories">Travel Stories</a></li>
+                    <li><a href="/about">About Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Top Destinations</h4>
+                <ul>
+                    <li><a href="/search/?state=Rajasthan">Rajasthan</a></li>
+                    <li><a href="/search/?state=Kerala">Kerala</a></li>
+                    <li><a href="/search/?state=Goa">Goa</a></li>
+                    <li><a href="/search/?state=Himachal+Pradesh">Himachal Pradesh</a></li>
+                    <li><a href="/search/?state=Uttarakhand">Uttarakhand</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} TripInsight. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Simple Footer Styles with Updated Color Scheme */
+    .simple-footer {
+        background-color: #508D4E;
+        color: #fff;
+        padding: 60px 0 20px;
+        margin-top: 60px;
+        font-family: inherit;
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Main Columns Layout */
+    .footer-columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    /* Column Sizing */
+    .footer-column {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .footer-column:first-child {
+        flex: 2;
+        min-width: 300px;
+    }
+
+    /* Brand Section */
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #A2CA71;
+    }
+
+    .footer-logo i {
+        color: #88D66C;
+    }
+
+    .footer-column p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        color: #A2CA71;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 15px;
+    }
+
+    .footer-social a {
+        color: #A2CA71;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-social a:hover {
+        color: #88D66C;
+    }
+
+    /* Links Styling */
+    .footer-column h4 {
+        color: #88D66C;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .footer-column ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-column li {
+        margin-bottom: 10px;
+    }
+
+    .footer-column a {
+        color: #A2CA71;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-column a:hover {
+        color: #88D66C;
+    }
+
+    /* Footer Bottom */
+    .footer-bottom {
+        padding-top: 20px;
+        border-top: 1px solid rgba(162, 202, 113, 0.2);
+        text-align: center;
+    }
+
+    .footer-bottom p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #A2CA71;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .footer-columns {
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .footer-column {
+            min-width: 100%;
+        }
+
+        .footer-column:first-child {
+            min-width: 100%;
+        }
+    }
+</style>

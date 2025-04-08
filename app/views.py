@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import googlemaps
 from django.http import JsonResponse
+from django.db.models import Avg
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.urls import reverse
@@ -24,35 +25,89 @@ def index(request):
 
 def details(request, pk):
     try:
+        # Get the place or return 404
         place = get_object_or_404(PlaceMode, id=pk)
-        places_pickle = os.path.join(settings.MEDIA_ROOT, 'places.pkl')
-        similarity_pickle = os.path.join(settings.MEDIA_ROOT, 'similarity.pkl')
-
+        
+        # Initialize variables
+        recommended_places = []
+        recommendation_source = "similar"
+        
+        # Try to get recommendations from the similarity model
         try:
-            with open(places_pickle, 'rb') as f:
-                place_dict = pickle.load(f)
+            places_pickle = os.path.join(settings.MEDIA_ROOT, 'places.pkl')
+            similarity_pickle = os.path.join(settings.MEDIA_ROOT, 'similarity.pkl')
 
-            with open(similarity_pickle, 'rb') as f:
-                similarity = pickle.load(f)
+            # Check if pickle files exist
+            if os.path.exists(places_pickle) and os.path.exists(similarity_pickle):
+                with open(places_pickle, 'rb') as f:
+                    place_dict = pickle.load(f)
 
-            name = place.Name
-            # Handle case where place name might not be in the pickle file
-            if not place_dict[place_dict['Name'] == name].empty:
-                place_index = place_dict[place_dict['Name'] == name].index[0]
-                distances = similarity[place_index]
-                places_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:5]
-                recommended_places = [PlaceMode.objects.get(id=i[0]) for i in places_list]
+                with open(similarity_pickle, 'rb') as f:
+                    similarity = pickle.load(f)
+
+                name = place.Name
+                # Find the place in the dataframe
+                matching_places = place_dict[place_dict['Name'] == name]
+                
+                if not matching_places.empty:
+                    place_index = matching_places.index[0]
+                    
+                    # Check if index is valid for similarity matrix
+                    if place_index < len(similarity):
+                        distances = similarity[place_index]
+                        places_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:5]
+                        
+                        # Get recommended places, handling any that might not exist in DB
+                        for i in places_list:
+                            try:
+                                rec_place = PlaceMode.objects.get(id=i[0])
+                                recommended_places.append(rec_place)
+                            except PlaceMode.DoesNotExist:
+                                continue
             else:
-                # Fallback if place not found in recommendation system
-                recommended_places = PlaceMode.objects.exclude(id=pk).order_by('?')[:4]
-        except (FileNotFoundError, KeyError, IndexError, EOFError) as e:
-            # Handle pickle file errors gracefully
-            recommended_places = PlaceMode.objects.exclude(id=pk).order_by('?')[:4]
-            messages.warning(request, "Some recommendations may not be available at the moment.")
+                recommendation_source = "fallback"
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Recommendation error: {str(e)}")
+            recommendation_source = "error"
+        
+        # If we couldn't get recommendations or not enough, fall back to random selection
+        if len(recommended_places) < 3:
+            # Get places with same type first
+            type_recommendations = list(PlaceMode.objects.filter(Type=place.Type).exclude(id=pk).order_by('?')[:2])
+            
+            # Then get places from same state
+            state_recommendations = list(PlaceMode.objects.filter(State=place.State).exclude(id=pk).exclude(id__in=[p.id for p in type_recommendations]).order_by('?')[:2])
+            
+            # Combine recommendations
+            fallback_recommendations = type_recommendations + state_recommendations
+            
+            # If still not enough, get random places
+            if len(fallback_recommendations) < 3:
+                random_recommendations = list(PlaceMode.objects.exclude(id=pk)
+                                             .exclude(id__in=[p.id for p in fallback_recommendations])
+                                             .order_by('?')[:4-len(fallback_recommendations)])
+                fallback_recommendations.extend(random_recommendations)
+            
+            # Use fallback recommendations
+            recommended_places = fallback_recommendations
+            recommendation_source = "fallback"
 
+        # Get crowd data for the place
         crowd_data = CrowdModel.objects.filter(location=place)
-        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        reviews = TripReview.objects.filter(place=place)
+        
+        # List of all months for display
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                 'July', 'August', 'September', 'October', 'November', 'December']
+        
+        # Get reviews for the place
+        reviews = TripReview.objects.filter(place=place).order_by('-created_at')
+
+        # Show appropriate message based on recommendation source
+        if recommendation_source == "fallback":
+            messages.info(request, "We've selected some destinations you might also enjoy.")
+        elif recommendation_source == "error":
+            messages.info(request, "Our recommendation system is currently being updated. Here are some places you might like.")
 
         return render(request, 'place-details-professional.html', {
             "rec_places": recommended_places,
@@ -63,48 +118,108 @@ def details(request, pk):
             "messages": messages.get_messages(request)
         })
     except Exception as e:
-        messages.error(request, f"We couldn't load this destination. Please try again later.")
+        # Log the error for debugging
+        print(f"Details view error: {str(e)}")
+        messages.error(request, "We couldn't load this destination. Please try again later.")
         return redirect('index')
 
 def search_view(request):
     try:
+        # Get search parameters from request
         query = request.GET.get('q', '').strip()
         state = request.GET.get('state', '').strip()
         place_type = request.GET.get('type', '').strip()
+        significance = request.GET.get('significance', '').strip()
+        sort_by = request.GET.get('sort', 'relevance').strip()
 
+        # Start with all places
         results = PlaceMode.objects.all()
 
-        # Apply filters
+        # Track which filters were applied for better messaging
+        applied_filters = []
+        
+        # Apply text search if provided
         if query:
+            applied_filters.append(f'search term "{query}"')
             results = results.filter(
                 models.Q(Name__icontains=query) |
                 models.Q(City__icontains=query) |
                 models.Q(State__icontains=query) |
                 models.Q(Significance__icontains=query) |
-                models.Q(Type__icontains=query)
+                models.Q(Type__icontains=query) |
+                models.Q(Description__icontains=query)
             )
 
+        # Apply state filter if provided
         if state:
+            applied_filters.append(f'state "{state}"')
             results = results.filter(State__iexact=state)
 
+        # Apply type filter if provided
         if place_type:
+            applied_filters.append(f'type "{place_type}"')
             results = results.filter(Type__iexact=place_type)
+            
+        # Apply significance filter if provided
+        if significance:
+            applied_filters.append(f'significance "{significance}"')
+            results = results.filter(Significance__iexact=significance)
+
+        # Apply sorting
+        if sort_by == 'rating':
+            # Sort by Google rating (convert to float first if possible)
+            results = sorted(
+                results,
+                key=lambda x: float(x.Google_rating) if x.Google_rating and x.Google_rating.replace('.', '', 1).isdigit() else 0,
+                reverse=True
+            )
+        elif sort_by == 'name':
+            # Sort by name alphabetically
+            results = sorted(results, key=lambda x: x.Name)
+        elif sort_by == 'state':
+            # Sort by state alphabetically
+            results = sorted(results, key=lambda x: x.State)
+        # Default is relevance, which is the default order from the database query
 
         # Check if no results found
-        if not results.exists() and (query or state or place_type):
-            if query and not state and not place_type:
-                message = f'No destinations found for "{query}". Try a different search term or browse our featured destinations.'
-            elif state and not query and not place_type:
-                message = f'No destinations found in {state}. Try a different state or browse our featured destinations.'
-            elif place_type and not query and not state:
-                message = f'No {place_type} destinations found. Try a different category or browse our featured destinations.'
+        if not results and (query or state or place_type or significance):
+            # Create a user-friendly message based on which filters were applied
+            if len(applied_filters) == 1:
+                message = f'No destinations found for {applied_filters[0]}. Try different search criteria or browse our featured destinations.'
             else:
-                message = 'No destinations match your search criteria. Try adjusting your filters.'
+                filters_text = ", ".join(applied_filters[:-1]) + " and " + applied_filters[-1]
+                message = f'No destinations match the combination of {filters_text}. Try adjusting your filters.'
 
             messages.info(request, message)
 
-            # Provide some recommended places instead
-            recommended = PlaceMode.objects.order_by('?')[:8]  # Random selection
+            # Provide personalized recommendations if user is logged in
+            if request.user.is_authenticated:
+                try:
+                    profile = Profile.objects.get(user=request.user)
+                    if profile.fav_type:
+                        recommended = PlaceMode.objects.filter(Type__iexact=profile.fav_type)[:4]
+                        if recommended:
+                            messages.info(request, f"Here are some {profile.fav_type} destinations you might enjoy based on your preferences.")
+                            return render(
+                                request,
+                                'search-page.html',
+                                {
+                                    'places': recommended,
+                                    'query': query,
+                                    'state': state,
+                                    'type': place_type,
+                                    'significance': significance,
+                                    'sort': sort_by,
+                                    'no_results': True,
+                                    'recommended': True,
+                                    'recommendation_type': 'personalized'
+                                }
+                            )
+                except Profile.DoesNotExist:
+                    pass  # Fall back to random recommendations
+
+            # Provide some recommended places instead (random selection)
+            recommended = list(PlaceMode.objects.order_by('?')[:8])
             return render(
                 request,
                 'search-page.html',
@@ -113,10 +228,18 @@ def search_view(request):
                     'query': query,
                     'state': state,
                     'type': place_type,
+                    'significance': significance,
+                    'sort': sort_by,
                     'no_results': True,
-                    'recommended': True
+                    'recommended': True,
+                    'recommendation_type': 'general'
                 }
             )
+
+        # Get all available states and types for filter dropdowns
+        all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
+        all_types = PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type')
+        all_significances = PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance')
 
         return render(
             request,
@@ -126,12 +249,26 @@ def search_view(request):
                 'query': query,
                 'state': state,
                 'type': place_type,
-                'count': results.count()
+                'significance': significance,
+                'sort': sort_by,
+                'count': len(results),
+                'all_states': all_states,
+                'all_types': all_types,
+                'all_significances': all_significances,
+                'applied_filters': applied_filters
             }
         )
     except Exception as e:
+        # Log the error for debugging
+        print(f"Search error: {str(e)}")
         messages.error(request, "An error occurred while processing your search. Please try again.")
-        return render(request, 'search-page.html', {'places': PlaceMode.objects.all()[:12]})
+        
+        # Return a safe fallback with some popular destinations
+        popular_places = PlaceMode.objects.all().order_by('-Google_rating')[:12]
+        return render(request, 'search-page.html', {
+            'places': popular_places,
+            'error_occurred': True
+        })
 
 def signup_view(request):
     if request.method == 'POST':
@@ -262,13 +399,22 @@ def logout_view(request):
     next_url = request.GET.get('next', 'index')
     return redirect(next_url)
 
-# Initialize Google Maps client with API key
-# Note: In production, this key should be stored in environment variables
+# Initialize Google Maps client with API key from settings
 try:
-    gmaps = googlemaps.Client(key="AIzaSyAyUAkmbw3LUmZy5w15DmMFaVh3x-utvHw")
+    # Get API key from settings (which now loads from .env)
+    GOOGLE_MAPS_API_KEY = getattr(settings, 'GOOGLE_MAPS_API_KEY', None)
+    
+    if GOOGLE_MAPS_API_KEY:
+        gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+        print("Google Maps API initialized successfully.")
+    else:
+        print("Google Maps API key not found. Distance calculations will be disabled.")
+        print("Run 'python setup_api_key.py' to configure your API key.")
+        gmaps = None
 except Exception as e:
     # Log the error but don't crash the application
     print(f"Error initializing Google Maps client: {e}")
+    print("Please check your API key and make sure it has the necessary permissions.")
     gmaps = None
 
 def get_distance(origin, destination):
@@ -472,110 +618,463 @@ def estimate_cost(request):
 #     return render(request, "reviewform.html", {"single_place": place}) 
 
 def submit_trip_review(request, pk):
+    # Check if user is authenticated
     if not request.user.is_authenticated:
-        return redirect("/login")
+        messages.error(request, "You must be logged in to submit a review.")
+        return redirect(f"/login?next={request.path}")
 
-    place = get_object_or_404(PlaceMode, id=pk)  # Ensures place exists
-
+    # Get the place or return 404
+    place = get_object_or_404(PlaceMode, id=pk)
+    
     if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        travel_medium = request.POST.get("travel_medium")
-        travel_cost = request.POST.get("travel_cost")
-        accommodation_cost = request.POST.get("accommodation_cost")
-        food_cost = request.POST.get("food_cost")
-        rating = request.POST.get("rating")
-        no_of_people = request.POST.get("no_of_people", 1)  # Default to 1 if not provided
+        try:
+            # Get form data
+            title = request.POST.get("title", "").strip()
+            description = request.POST.get("description", "").strip()
+            travel_medium = request.POST.get("travel_medium")
+            
+            # Validate required fields
+            if not title:
+                messages.error(request, "Please provide a title for your review.")
+                return render(request, "reviewform.html", {"single_place": place})
+                
+            if not description:
+                messages.error(request, "Please provide a description of your experience.")
+                return render(request, "reviewform.html", {"single_place": place})
+            
+            # Check word count limit (100 words)
+            word_count = len(description.split())
+            if word_count > 100:
+                messages.error(request, "Please limit your description to 100 words. Current count: " + str(word_count))
+                return render(request, "reviewform.html", {"single_place": place})
+                
+            if not travel_medium:
+                messages.error(request, "Please select how you traveled to this destination.")
+                return render(request, "reviewform.html", {"single_place": place})
+            
+            # Process numeric fields with validation
+            try:
+                rating = int(request.POST.get("rating", 0))
+                if rating < 1 or rating > 5:
+                    rating = None
+            except (ValueError, TypeError):
+                rating = None
+                
+            try:
+                no_of_people = int(request.POST.get("no_of_people", 1))
+                if no_of_people < 1:
+                    no_of_people = 1
+            except (ValueError, TypeError):
+                no_of_people = 1
+                
+            # Process cost fields with validation
+            try:
+                travel_cost = float(request.POST.get("travel_cost", 0))
+                if travel_cost < 0:
+                    travel_cost = 0
+            except (ValueError, TypeError):
+                travel_cost = 0
+                
+            try:
+                accommodation_cost = float(request.POST.get("accommodation_cost", 0))
+                if accommodation_cost < 0:
+                    accommodation_cost = 0
+            except (ValueError, TypeError):
+                accommodation_cost = 0
+                
+            try:
+                food_cost = float(request.POST.get("food_cost", 0))
+                if food_cost < 0:
+                    food_cost = 0
+            except (ValueError, TypeError):
+                food_cost = 0
 
-        # Create TripReview object
-        TripReview.objects.create(
-            title=title,
-            description=description,
-            travel_medium=travel_medium,
-            travel_cost=travel_cost,
-            accommodation_cost=accommodation_cost,
-            food_cost=food_cost,
-            user=request.user,
-            place=place,
-            rating=rating,
-            no_of_people=no_of_people
-        )
+            # Create TripReview object
+            review = TripReview.objects.create(
+                title=title,
+                description=description,
+                travel_medium=travel_medium,
+                travel_cost=travel_cost,
+                accommodation_cost=accommodation_cost,
+                food_cost=food_cost,
+                user=request.user,
+                place=place,
+                rating=rating,
+                no_of_people=no_of_people
+            )
+            
+            # Update user's trophy count using the new logic
+            try:
+                profile = Profile.objects.get(user=request.user)
+                profile.update_trophies()  # Use the new method to calculate trophies
+                
+                # Show appropriate trophy message based on count
+                review_count = TripReview.objects.filter(user=request.user).count()
+                if review_count == 10:
+                    messages.success(request, "🏆 Congratulations! You've earned your first trophy for submitting 10 reviews!")
+                elif review_count == 25:
+                    messages.success(request, "🏆 Congratulations! You've earned your second trophy for submitting 25 reviews!")
+                elif review_count == 50:
+                    messages.success(request, "🏆 Congratulations! You've earned your third trophy for submitting 50 reviews!")
+                elif review_count == 100:
+                    messages.success(request, "🏆 Congratulations! You've earned your fourth trophy for submitting 100 reviews! You're a TripInsight legend!")
+                
+            except Profile.DoesNotExist:
+                # If user doesn't have a profile, suggest creating one
+                messages.info(request, "Complete your profile to track your progress and earn trophies for your reviews!")
 
-        messages.success(request, "✅ Your review has been submitted successfully! Thank you for sharing your experience.")
+            messages.success(request, "✅ Your review has been submitted successfully! Thank you for sharing your experience.")
 
-        # Redirect to the place detail page with a parameter to indicate a successful submission
-        return redirect(reverse("details", kwargs={"pk": place.id}))
+            # Redirect to the place detail page
+            return redirect(reverse("details", kwargs={"pk": place.id}))
+            
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Review submission error: {str(e)}")
+            messages.error(request, "An error occurred while submitting your review. Please try again.")
+            return render(request, "reviewform.html", {"single_place": place})
 
-    return render(request, "reviewform.html", {"single_place": place})
+    # For GET requests, show the form
+    return render(request, "reviewform.html", {
+        "single_place": place,
+        "travel_medium_choices": TripReview.TRAVEL_MEDIUM_CHOICES
+    })
 
 def create_profile(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to create a profile.")
+        return redirect("login")
+        
     if request.method == "POST":
         full_name = request.POST.get("name")
         description = request.POST.get("description")
         state = request.POST.get("state")
+        city = request.POST.get("city", "")
+        fav_type = request.POST.get("fav_type", "")
+        fav_significance = request.POST.get("fav_significance", "")
 
-        if not full_name or not description or not state:
-            messages.error(request, "All fields are required.")
+        if not description or not state:
+            messages.error(request, "Description and state are required fields.")
             return redirect("create_profile")
 
-        user = request.user if request.user.is_authenticated else None
-
-        profile, created = ProfileModel.objects.get_or_create(user=user)
+        # Get or create profile for the current user
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        
+        # Update profile fields
         profile.state = state
+        profile.city = city
         profile.description = description
+        profile.fav_type = fav_type
+        profile.fav_significance = fav_significance
         profile.save()
 
-        messages.success(request, "Profile created successfully!")
+        messages.success(request, "✅ Profile created successfully! You can now get personalized recommendations.")
         return redirect("/")
 
     return render(request, "profile_form.html")
 
 def profile(request):
-    if request.user.is_authenticated:
-        if not ProfileModel.objects.filter(user=request.user).exists():
-            return redirect("/create-profile")
-        profile = ProfileModel.objects.get(user=request.user)
-        reviews = None
-        review_count = 0
-        trophies = 0
-        if TripReview.objects.filter(user=request.user).exists():
-            reviews = TripReview.objects.filter(user=request.user)
-            review_count = reviews.count()
-            trophies = int(review_count / 2)
-        return render(request, "profilepage.html", {
-            "trophies": trophies,
-            "profile": profile,
-            "reviews": reviews,
-            "count": review_count,
-            "messages": messages.get_messages(request)
-        })
-    else:
+    if not request.user.is_authenticated:
         messages.error(request, "Please login to view your profile")
         return redirect("/login")
+        
+    # Check if user has a profile, if not redirect to create one
+    if not Profile.objects.filter(user=request.user).exists():
+        messages.info(request, "Please complete your profile to get personalized recommendations.")
+        return redirect("/create-profile")
+        
+    # Get user profile
+    profile = Profile.objects.get(user=request.user)
+    
+    # Get user reviews
+    reviews = TripReview.objects.filter(user=request.user).order_by('-created_at')
+    review_count = reviews.count()
+    
+    # Update trophies using the new logic
+    profile.update_trophies()
+    
+    # Get trophy progress information
+    trophy_progress = {
+        'current_trophies': profile.trophies,
+        'total_reviews': review_count,
+        'next_milestone': 10 if review_count < 10 else 25 if review_count < 25 else 50 if review_count < 50 else 100 if review_count < 100 else None,
+        'reviews_needed': 10 - review_count if review_count < 10 else 25 - review_count if review_count < 25 else 50 - review_count if review_count < 50 else 100 - review_count if review_count < 100 else 0,
+        'progress_percentage': min(100, (review_count / 10) * 100) if review_count < 10 else 
+                              min(100, ((review_count - 10) / 15) * 100) if review_count < 25 else 
+                              min(100, ((review_count - 25) / 25) * 100) if review_count < 50 else 
+                              min(100, ((review_count - 50) / 50) * 100) if review_count < 100 else 100
+    }
+    
+    # Get places the user has reviewed
+    reviewed_places = PlaceMode.objects.filter(id__in=reviews.values_list('place_id', flat=True)).distinct()
+    
+    # Get states the user has visited (based on reviews)
+    visited_states = reviewed_places.values_list('State', flat=True).distinct()
+    
+    return render(request, "profilepage.html", {
+        "profile": profile,
+        "reviews": reviews,
+        "count": review_count,
+        "trophy_progress": trophy_progress,
+        "reviewed_places": reviewed_places,
+        "visited_states": visited_states,
+        "messages": messages.get_messages(request)
+    })
 
 def stories(request):
-    reviews = TripReview.objects.all()
-    return render(request, "stories-new.html", {"reviews": reviews})
+    try:
+        # Get filter parameters
+        travel_medium = request.GET.get('travel_medium', '')
+        state = request.GET.get('state', '')
+        sort_by = request.GET.get('sort', 'recent')
+        
+        # Start with all reviews
+        reviews = TripReview.objects.all()
+        
+        # Apply filters if specified
+        if travel_medium:
+            reviews = reviews.filter(travel_medium=travel_medium)
+            
+        if state and reviews:
+            # Filter by place state
+            place_ids = PlaceMode.objects.filter(State__iexact=state).values_list('id', flat=True)
+            reviews = reviews.filter(place_id__in=place_ids)
+        
+        # Apply sorting
+        if sort_by == 'recent':
+            reviews = reviews.order_by('-created_at')
+        elif sort_by == 'rating_high':
+            reviews = reviews.order_by('-rating')
+        elif sort_by == 'rating_low':
+            reviews = reviews.order_by('rating')
+        elif sort_by == 'cost_high':
+            # Calculate total cost for sorting
+            reviews = sorted(
+                reviews,
+                key=lambda x: (
+                    float(x.travel_cost or 0) + 
+                    float(x.accommodation_cost or 0) + 
+                    float(x.food_cost or 0)
+                ),
+                reverse=True
+            )
+        elif sort_by == 'cost_low':
+            # Calculate total cost for sorting
+            reviews = sorted(
+                reviews,
+                key=lambda x: (
+                    float(x.travel_cost or 0) + 
+                    float(x.accommodation_cost or 0) + 
+                    float(x.food_cost or 0)
+                )
+            )
+        
+        # Get all available states for filter dropdown
+        all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
+        
+        # Get featured reviews (highest rated)
+        featured_reviews = TripReview.objects.filter(rating__isnull=False).order_by('-rating')[:3]
+        
+        # Get popular travel mediums
+        travel_medium_counts = TripReview.objects.values('travel_medium').annotate(
+            count=models.Count('travel_medium')
+        ).order_by('-count')
+        
+        context = {
+            "reviews": reviews,
+            "featured_reviews": featured_reviews,
+            "travel_medium_counts": travel_medium_counts,
+            "all_states": all_states,
+            "selected_medium": travel_medium,
+            "selected_state": state,
+            "selected_sort": sort_by,
+            "travel_medium_choices": TripReview.TRAVEL_MEDIUM_CHOICES
+        }
+        
+        return render(request, "stories-new.html", context)
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Stories view error: {str(e)}")
+        messages.error(request, "An error occurred while loading travel stories. Please try again.")
+        
+        # Return a minimal context with some reviews to show
+        return render(request, "stories-new.html", {
+            "reviews": TripReview.objects.all().order_by('-created_at')[:10],
+            "error_occurred": True
+        })
 
 def about(request):
     return render(request, "about-new.html")
 
 def explore(request):
-    # Get filter type from query parameters
-    place_type = request.GET.get('type')
-
-    # Filter places if a type is specified
-    if place_type and place_type != 'all':
-        places = PlaceMode.objects.filter(Type__icontains=place_type)
-    else:
+    try:
+        # Get filter parameters from query
+        place_type = request.GET.get('type', '')
+        state = request.GET.get('state', '')
+        significance = request.GET.get('significance', '')
+        
+        # Start with all places
         places = PlaceMode.objects.all()
+        
+        # Apply filters if specified
+        if place_type and place_type != 'all':
+            places = places.filter(Type__icontains=place_type)
+            
+        if state and state != 'all':
+            places = places.filter(State__iexact=state)
+            
+        if significance and significance != 'all':
+            places = places.filter(Significance__iexact=significance)
+        
+        # Get featured places (places with highest ratings)
+        # Convert Google_rating to float for proper sorting
+        try:
+            featured_places = sorted(
+                PlaceMode.objects.all(),
+                key=lambda x: float(x.Google_rating) if x.Google_rating and x.Google_rating.replace('.', '', 1).isdigit() else 0,
+                reverse=True
+            )[:3]
+        except Exception:
+            # Fallback if sorting fails
+            featured_places = PlaceMode.objects.all().order_by('?')[:3]
+        
+        # Get popular places by state (for the state section)
+        popular_states = PlaceMode.objects.values('State').annotate(
+            count=models.Count('State')
+        ).order_by('-count')[:6]
+        
+        state_highlights = {}
+        for state_data in popular_states:
+            state_name = state_data['State']
+            if state_name:  # Ensure state name is not empty
+                # Get a representative place from this state
+                state_places = PlaceMode.objects.filter(State=state_name).order_by('?')[:1]
+                if state_places:
+                    state_highlights[state_name] = state_places[0]
+        
+        # Get all available types, states and significances for filter dropdowns
+        all_types = PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type')
+        all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
+        all_significances = PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance')
+        
+        # Get personalized recommendations if user is logged in
+        personalized_recommendations = []
+        if request.user.is_authenticated:
+            try:
+                profile = Profile.objects.get(user=request.user)
+                if profile.fav_type:
+                    personalized_recommendations = PlaceMode.objects.filter(
+                        Type__iexact=profile.fav_type
+                    ).order_by('?')[:4]
+            except Profile.DoesNotExist:
+                pass
+        
+        context = {
+            'places': places,
+            'featured_places': featured_places,
+            'state_highlights': state_highlights,
+            'all_types': all_types,
+            'all_states': all_states,
+            'all_significances': all_significances,
+            'selected_type': place_type,
+            'selected_state': state,
+            'selected_significance': significance,
+            'personalized_recommendations': personalized_recommendations
+        }
+        
+        return render(request, "explore-page.html", context)
+        
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Explore view error: {str(e)}")
+        messages.error(request, "An error occurred while loading the explore page. Please try again.")
+        
+        # Return a minimal context with some places to show
+        return render(request, "explore-page.html", {
+            'places': PlaceMode.objects.all()[:12],
+            'featured_places': PlaceMode.objects.all().order_by('?')[:3],
+            'error_occurred': True
+        })
 
-    # Get featured places (places with highest ratings)
-    featured_places = PlaceMode.objects.all().order_by('-Google_rating')[:3]
-
-    context = {
-        'places': places,
-        'featured_places': featured_places
-    }
-
-    return render(request, "explore-page.html", context)
+def api_estimate_costs(request, pk):
+    """
+    API endpoint to estimate costs for a place based on user reviews.
+    Returns JSON with cost estimates for accommodation, food, travel, and entry fee.
+    """
+    try:
+        place = get_object_or_404(PlaceMode, id=pk)
+        
+        # Get all reviews for this place
+        reviews = TripReview.objects.filter(place=place)
+        review_count = reviews.count()
+        
+        if review_count > 0:
+            # Calculate average costs from reviews
+            avg_accommodation = reviews.aggregate(Avg('accommodation_cost'))['accommodation_cost__avg'] or 0
+            avg_food = reviews.aggregate(Avg('food_cost'))['food_cost__avg'] or 0
+            avg_travel = reviews.aggregate(Avg('travel_cost'))['travel_cost__avg'] or 0
+            
+            # Use default entry fee if Fees field is not available
+            entry_fee = 0
+            try:
+                if hasattr(place, 'Fees') and place.Fees:
+                    # Try to extract a numeric value from the Fees field
+                    fees_text = str(place.Fees)
+                    # Remove non-numeric characters except for decimal points
+                    import re
+                    fees_numeric = re.sub(r'[^0-9.]', '', fees_text)
+                    if fees_numeric:
+                        entry_fee = float(fees_numeric)
+            except Exception as e:
+                print(f"Error parsing entry fee: {str(e)}")
+            
+            # Calculate total cost (per person per day) - without entry fee
+            total_cost = avg_accommodation + avg_food + avg_travel
+            
+            # Use default values if any cost is zero
+            if avg_accommodation == 0:
+                avg_accommodation = 1500  # Default accommodation cost
+            
+            if avg_food == 0:
+                avg_food = 800  # Default food cost
+            
+            if avg_travel == 0:
+                avg_travel = 1200  # Default travel cost
+            
+            if total_cost == 0:
+                total_cost = avg_accommodation + avg_food + avg_travel
+            
+            return JsonResponse({
+                'has_reviews': True,
+                'review_count': review_count,
+                'accommodation_cost': float(avg_accommodation),
+                'food_cost': float(avg_food),
+                'travel_cost': float(avg_travel),
+                'entry_fee': float(entry_fee),
+                'total_cost': float(total_cost)
+            })
+        else:
+            # If no reviews, provide default estimates
+            return JsonResponse({
+                'has_reviews': True,  # Changed to true to show estimates anyway
+                'review_count': 0,
+                'accommodation_cost': 1500.0,  # Default values
+                'food_cost': 800.0,
+                'travel_cost': 1200.0,
+                'entry_fee': 0.0,  # Removed from display but keeping in API for compatibility
+                'total_cost': 3500.0
+            })
+    except Exception as e:
+        print(f"Error in cost estimation API: {str(e)}")
+        # Return a response with default values instead of an error
+        return JsonResponse({
+            'has_reviews': True,
+            'review_count': 0,
+            'accommodation_cost': 1500.0,
+            'food_cost': 800.0,
+            'travel_cost': 1200.0,
+            'entry_fee': 0.0,  # Removed from display but keeping in API for compatibility
+            'total_cost': 3500.0,
+            'note': 'Using default estimates'
+        })

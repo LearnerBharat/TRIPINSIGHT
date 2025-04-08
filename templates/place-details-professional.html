@@ -9,9 +9,11 @@
     <meta name="description" content="Explore {{ single_place.Name }} in {{ single_place.City }}, {{ single_place.State }}. Find details, reviews, nearby attractions and plan your visit.">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/transitions.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="{% static 'js/navbar.js' %}" defer></script>
+    <script src="{% static 'js/transitions.js' %}" defer></script>
     
     <style>
         /* Place Details Page Styles */
@@ -205,6 +207,78 @@
             font-size: 14px;
             color: var(--text-light);
             font-weight: normal;
+        }
+        
+        .total-cost {
+            grid-column: 1 / -1;
+            background-color: var(--lightest-color);
+            border: 1px solid var(--primary-light);
+        }
+        
+        .total-cost h4, .total-cost p {
+            color: var(--primary-dark);
+            font-size: 1.1em;
+        }
+        
+        .cost-note {
+            grid-column: 1 / -1;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--lightest-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            color: var(--text-light);
+            text-align: center;
+        }
+        
+        .cost-note i {
+            color: var(--primary-color);
+            margin-right: 5px;
+        }
+        
+        .no-cost-data, .cost-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .no-cost-data i, .cost-error i {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+        
+        .cost-error i {
+            color: #e74c3c;
+        }
+        
+        .no-cost-data p, .cost-error p {
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+        
+        .btn-submit-review {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 10px;
+            transition: var(--transition);
+        }
+        
+        .btn-submit-review:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
         }
         
         .place-image {
@@ -906,7 +980,7 @@
                         <i class="fas fa-map-marker-alt"></i> {{ single_place.City }}, {{ single_place.State }}
                     </span>
                     <span class="rating">
-                        <i class="fas fa-star"></i> 4.8 (1,234 reviews)
+                        <i class="fas fa-star"></i> {{ single_place.Google_rating|default:"N/A" }} (Google rating)
                     </span>
                 </div>
                 <p class="description">
@@ -940,52 +1014,13 @@
         <!-- Tabs Section -->
         <div class="tabs-section">
             <div class="tabs-nav">
-                <button class="tab-button active" data-tab="about">About</button>
-                <button class="tab-button" data-tab="nearby">Nearby Attractions</button>
+                <button class="tab-button active" data-tab="nearby">Nearby Attractions</button>
                 <button class="tab-button" data-tab="reviews">Reviews</button>
                 <button class="tab-button" data-tab="best-time">Best Time to Visit</button>
             </div>
 
-            <!-- About Tab -->
-            <div class="tab-content active" id="about-tab">
-                <div class="about-tab">
-                    <div class="about-content">
-                        <h3>About {{ single_place.Name }}</h3>
-                        <p>{{ single_place.Description }}</p>
-                        <p>{{ single_place.Description }}</p>
-                        
-                        <div class="highlights">
-                            <h3>Highlights</h3>
-                            <div class="highlights-list">
-                                <div class="highlight-item">
-                                    <i class="fas fa-landmark"></i>
-                                    <span>Historical Significance</span>
-                                </div>
-                                <div class="highlight-item">
-                                    <i class="fas fa-camera"></i>
-                                    <span>Photography Spots</span>
-                                </div>
-                                <div class="highlight-item">
-                                    <i class="fas fa-tree"></i>
-                                    <span>Natural Beauty</span>
-                                </div>
-                                <div class="highlight-item">
-                                    <i class="fas fa-utensils"></i>
-                                    <span>Local Cuisine</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-
-                    </div>
-                    <div class="map-container">
-                        <iframe src="{{ single_place.map_url }}" allowfullscreen="" loading="lazy"></iframe>
-                    </div>
-                </div>
-            </div>
-
             <!-- Nearby Attractions Tab -->
-            <div class="tab-content" id="nearby-tab">
+            <div class="tab-content active" id="nearby-tab">
                 <div class="nearby-attractions">
                     <h3>Nearby Attractions</h3>
                     <div class="attractions-grid">
@@ -1028,118 +1063,120 @@
                 <div class="reviews-section">
                     <div class="reviews-header">
                         <div class="reviews-summary">
-                            <div class="overall-rating">
-                                <div class="rating-number">4.8</div>
-                                <div class="rating-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
+                            {% if reviews %}
+                                {% with avg_rating=reviews|avg_rating review_count=reviews|length %}
+                                <div class="overall-rating">
+                                    <div class="rating-number">{{ avg_rating|floatformat:1 }}</div>
+                                    <div class="rating-stars">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= avg_rating|floatformat:0 %}
+                                                <i class="fas fa-star"></i>
+                                            {% elif forloop.counter <= avg_rating|add:0.5|floatformat:0 %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="rating-count">{{ review_count }} review{{ review_count|pluralize }}</div>
                                 </div>
-                                <div class="rating-count">1,234 reviews</div>
-                            </div>
-                            <div class="rating-breakdown">
-                                <div class="rating-bar">
-                                    <div class="rating-label">
-                                        <i class="fas fa-star"></i> 5
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 75%"></div>
-                                    </div>
-                                    <div class="rating-percentage">75%</div>
+                                {% endwith %}
+                                
+                                <div class="rating-breakdown">
+                                    {% for i in "54321" %}
+                                        {% with rating_count=reviews|filter_by_rating:forloop.counter|length percentage=reviews|rating_percentage:forloop.counter %}
+                                        <div class="rating-bar">
+                                            <div class="rating-label">
+                                                <i class="fas fa-star"></i> {{ forloop.counter }}
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress" style="width: {{ percentage }}%"></div>
+                                            </div>
+                                            <div class="rating-percentage">{{ percentage }}%</div>
+                                        </div>
+                                        {% endwith %}
+                                    {% endfor %}
                                 </div>
-                                <div class="rating-bar">
-                                    <div class="rating-label">
-                                        <i class="fas fa-star"></i> 4
+                            {% else %}
+                                <div class="overall-rating">
+                                    <div class="rating-number">-</div>
+                                    <div class="rating-stars">
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
                                     </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 20%"></div>
-                                    </div>
-                                    <div class="rating-percentage">20%</div>
+                                    <div class="rating-count">No reviews yet</div>
                                 </div>
-                                <div class="rating-bar">
-                                    <div class="rating-label">
-                                        <i class="fas fa-star"></i> 3
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 3%"></div>
-                                    </div>
-                                    <div class="rating-percentage">3%</div>
-                                </div>
-                                <div class="rating-bar">
-                                    <div class="rating-label">
-                                        <i class="fas fa-star"></i> 2
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 1%"></div>
-                                    </div>
-                                    <div class="rating-percentage">1%</div>
-                                </div>
-                                <div class="rating-bar">
-                                    <div class="rating-label">
-                                        <i class="fas fa-star"></i> 1
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 1%"></div>
-                                    </div>
-                                    <div class="rating-percentage">1%</div>
-                                </div>
-                            </div>
+                            {% endif %}
                         </div>
-                        <button class="write-review-btn">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn">
                             <i class="fas fa-edit"></i> Write a Review
-                        </button>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn">
+                            <i class="fas fa-edit"></i> Login to Write a Review
+                        </a>
+                        {% endif %}
                     </div>
                     <div class="reviews-list">
-                        <!-- Sample reviews -->
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div class="reviewer-info">
-                                    <div class="reviewer-avatar">
-                                        <i class="fas fa-user"></i>
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div class="reviewer-info">
+                                        <div class="reviewer-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="reviewer-details">
+                                            <h4>{{ review.user.username }}</h4>
+                                            <div class="review-date">{{ review.created_at|date:"F j, Y" }}</div>
+                                        </div>
                                     </div>
-                                    <div class="reviewer-details">
-                                        <h4>Rahul Sharma</h4>
-                                        <div class="review-date">Visited in June 2023</div>
-                                    </div>
-                                </div>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                            <div class="review-content">
-                                <p>An absolutely breathtaking experience! The architecture is stunning and the history behind it is fascinating. I would recommend visiting early in the morning to avoid crowds. The gardens are also beautiful and well-maintained.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div class="reviewer-info">
-                                    <div class="reviewer-avatar">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="reviewer-details">
-                                        <h4>Priya Patel</h4>
-                                        <div class="review-date">Visited in April 2023</div>
+                                    <div class="review-rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
                                     </div>
                                 </div>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
+                                <div class="review-content">
+                                    <h5>{{ review.title }}</h5>
+                                    <p>{{ review.description }}</p>
+                                    
+                                    <div class="review-details">
+                                        <div class="review-detail">
+                                            <i class="fas fa-users"></i> Group Size: {{ review.no_of_people }}
+                                        </div>
+                                        <div class="review-detail">
+                                            <i class="fas fa-plane-departure"></i> Travel: {{ review.get_travel_medium_display }}
+                                        </div>
+                                        <div class="review-detail">
+                                            <i class="fas fa-ticket-alt"></i> Travel Cost: ₹{{ review.travel_cost }}
+                                        </div>
+                                        <div class="review-detail">
+                                            <i class="fas fa-hotel"></i> Accommodation: ₹{{ review.accommodation_cost }}
+                                        </div>
+                                        <div class="review-detail">
+                                            <i class="fas fa-utensils"></i> Food: ₹{{ review.food_cost }}
+                                        </div>
+                                    </div>
+                                    
+
                                 </div>
                             </div>
-                            <div class="review-content">
-                                <p>A must-visit destination in India! The place is well-preserved and offers a glimpse into the rich cultural heritage. The only downside was the large crowds, but that's expected for such a popular attraction.</p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-reviews">
+                                <i class="fas fa-comment-slash"></i>
+                                <p>No reviews yet. Be the first to share your experience!</p>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -1235,6 +1272,97 @@
                 });
             });
             
+            // Add CSS for the review elements
+            const style = document.createElement('style');
+            style.textContent = `
+                .write-review-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 12px 20px;
+                    background-color: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: var(--border-radius);
+                    font-weight: 500;
+                    font-size: 15px;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    text-decoration: none;
+                }
+                
+                .write-review-btn:hover {
+                    background-color: var(--primary-dark);
+                    transform: translateY(-2px);
+                    box-shadow: var(--hover-shadow);
+                }
+                
+                .review-content h5 {
+                    font-size: 18px;
+                    margin-bottom: 10px;
+                    color: var(--secondary-color);
+                }
+                
+                .review-details {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 10px;
+                    margin-top: 15px;
+                    background-color: var(--lightest-color);
+                    padding: 15px;
+                    border-radius: var(--border-radius);
+                }
+                
+                .review-detail {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 14px;
+                    color: var(--text-light);
+                }
+                
+                .review-detail i {
+                    color: var(--primary-color);
+                }
+                
+                .review-image {
+                    margin-top: 15px;
+                    border-radius: var(--border-radius);
+                    overflow: hidden;
+                    max-height: 300px;
+                }
+                
+                .review-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                
+                .no-reviews {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 40px;
+                    background-color: var(--lightest-color);
+                    border-radius: var(--border-radius);
+                    text-align: center;
+                }
+                
+                .no-reviews i {
+                    font-size: 48px;
+                    color: var(--text-muted);
+                    margin-bottom: 15px;
+                }
+                
+                .no-reviews p {
+                    color: var(--text-light);
+                    font-size: 16px;
+                }
+            `;
+            document.head.appendChild(style);
+            
             // Estimate Cost Button
             const estimateCostBtn = document.getElementById('estimateCostBtn');
             const costDisplay = document.getElementById('cost-display');
@@ -1248,31 +1376,88 @@
                     costLoader.style.display = 'flex';
                     costResults.innerHTML = '';
                     
-                    // Simulate API call with setTimeout
-                    setTimeout(function() {
-                        // Hide loader
-                        costLoader.style.display = 'none';
-                        
-                        // Populate results
-                        costResults.innerHTML = `
-                            <div class="cost-item">
-                                <h4><i class="fas fa-hotel"></i> Accommodation</h4>
-                                <p>₹2,500 <span>per night</span></p>
-                            </div>
-                            <div class="cost-item">
-                                <h4><i class="fas fa-utensils"></i> Food</h4>
-                                <p>₹1,200 <span>per day</span></p>
-                            </div>
-                            <div class="cost-item">
-                                <h4><i class="fas fa-ticket-alt"></i> Attractions</h4>
-                                <p>₹800 <span>per person</span></p>
-                            </div>
-                            <div class="cost-item">
-                                <h4><i class="fas fa-taxi"></i> Local Transport</h4>
-                                <p>₹600 <span>per day</span></p>
-                            </div>
-                        `;
-                    }, 1500);
+                    // Get place ID from the page
+                    const placeId = {{ single_place.id }};
+                    
+                    // Fetch cost data from the server
+                    fetch(`/api/estimate-costs/${placeId}/`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Hide loader
+                            costLoader.style.display = 'none';
+                            
+                            // Always show cost data (we now provide defaults even if no reviews)
+                            // Populate results with data
+                            costResults.innerHTML = `
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-hotel"></i> Accommodation</h4>
+                                    <p>₹${data.accommodation_cost.toFixed(0)} <span>per night</span></p>
+                                </div>
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-utensils"></i> Food</h4>
+                                    <p>₹${data.food_cost.toFixed(0)} <span>per day</span></p>
+                                </div>
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-plane-departure"></i> Travel</h4>
+                                    <p>₹${data.travel_cost.toFixed(0)} <span>average</span></p>
+                                </div>
+                                <div class="cost-item total-cost">
+                                    <h4><i class="fas fa-coins"></i> Total Estimate</h4>
+                                    <p>₹${(parseFloat(data.accommodation_cost) + parseFloat(data.food_cost) + parseFloat(data.travel_cost)).toFixed(0)} <span>per person</span></p>
+                                </div>
+                            `;
+                            
+                            // Add note about the source of data
+                            const noteElement = document.createElement('div');
+                            noteElement.className = 'cost-note';
+                            
+                            if (data.review_count > 0) {
+                                noteElement.innerHTML = `
+                                    <p><i class="fas fa-info-circle"></i> Based on ${data.review_count} user reviews. Actual costs may vary.</p>
+                                `;
+                            } else {
+                                noteElement.innerHTML = `
+                                    <p><i class="fas fa-info-circle"></i> These are estimated costs. Help others by <a href="{% url 'submit_trip_review' pk=single_place.id %}">submitting a review</a> with your actual expenses.</p>
+                                `;
+                            }
+                            
+                            costResults.appendChild(noteElement);
+                        })
+                        .catch(error => {
+                            // Hide loader and show default cost estimates instead of error
+                            costLoader.style.display = 'none';
+                            
+                            // Show default estimates even on error
+                            costResults.innerHTML = `
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-hotel"></i> Accommodation</h4>
+                                    <p>₹1,500 <span>per night</span></p>
+                                </div>
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-utensils"></i> Food</h4>
+                                    <p>₹800 <span>per day</span></p>
+                                </div>
+                                <div class="cost-item">
+                                    <h4><i class="fas fa-plane-departure"></i> Travel</h4>
+                                    <p>₹1,200 <span>average</span></p>
+                                </div>
+                                <div class="cost-item total-cost">
+                                    <h4><i class="fas fa-coins"></i> Total Estimate</h4>
+                                    <p>₹3,500 <span>per person</span></p>
+                                </div>
+                                
+                                <div class="cost-note">
+                                    <p><i class="fas fa-info-circle"></i> These are estimated costs. Help others by <a href="{% url 'submit_trip_review' pk=single_place.id %}">submitting a review</a> with your actual expenses.</p>
+                                </div>
+                            `;
+                            
+                            console.error('Error fetching cost data:', error);
+                        });
                 });
             }
         });

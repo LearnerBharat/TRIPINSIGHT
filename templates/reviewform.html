@@ -8,10 +8,14 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/transitions.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+    <script src="{% static 'js/transitions.js' %}" defer></script>
     <style>
       :root {
         --primary-color: #508D4E;
@@ -173,15 +177,36 @@
         <div class="form-group">
           <label for="description">
             <i class="fa-solid fa-comment-dots"></i>
-            Description
+            Description (max 100 words)
           </label>
           <textarea
             id="description"
             name="description"
-            placeholder="Share your experience in detail..."
+            placeholder="Share your experience in detail (max 100 words)..."
             required
+            maxlength="500"
+            onkeyup="checkWordCount(this)"
           ></textarea>
+          <small id="word-count" class="form-help">0 words (max 100)</small>
         </div>
+        <script>
+          function checkWordCount(textarea) {
+            const text = textarea.value;
+            const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+            const wordCountDisplay = document.getElementById('word-count');
+            wordCountDisplay.textContent = wordCount + ' words (max 100)';
+            
+            if (wordCount > 100) {
+              wordCountDisplay.style.color = 'red';
+              textarea.setCustomValidity('Please limit your description to 100 words.');
+            } else {
+              wordCountDisplay.style.color = '';
+              textarea.setCustomValidity('');
+            }
+          }
+        </script>
+        
+
         <div class="form-group">
           <label for="travel-medium">
             <i class="fa-solid fa-plane-departure"></i>

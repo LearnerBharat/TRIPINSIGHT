@@ -15,5 +15,8 @@ urlpatterns = [
     path('stories/', views.stories, name="stories"),
     path('about/', views.about, name="about"),
     path('explore/', views.explore, name="explore"),
+    
+    # API endpoints
+    path('api/estimate-costs/<int:pk>/', views.api_estimate_costs, name="api_estimate_costs"),
 ]
 

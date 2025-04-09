@@ -156,21 +156,16 @@
     }
 
     .search-filters {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.3s ease;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
     }
 
     .search-filters.show {
-      max-height: 500px;
-      opacity: 1;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--medium-gray);
+      display: grid;
     }
 
     .filter-group {
@@ -201,7 +196,48 @@
     .filter-group select:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: var(--focus-shadow);
+      box-shadow: 0 0 0 3px rgba(52, 121, 40, 0.2);
+    }
+    
+    .filter-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+    
+    .filter-apply-button, .filter-reset-button {
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-apply-button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+    
+    .filter-apply-button:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .filter-reset-button {
+      background-color: white;
+      color: var(--text-color);
+      border: 1px solid var(--medium-gray);
+    }
+    
+    .filter-reset-button:hover {
+      background-color: var(--light-gray);
+      transform: translateY(-2px);
     }
 
     /* Featured Destinations Section */
@@ -684,66 +720,74 @@
       
       <!-- Search Container -->
       <div class="search-container">
-        <form action="/search/" method="GET" id="search-form">
+        <form action="{% url 'search' %}" method="GET" id="searchForm">
           <div class="search-box">
             <div class="search-input">
               <i class="fas fa-search"></i>
-              <input type="text" name="q" placeholder="Where would you like to go?">
+              <input 
+                type="text" 
+                name="q" 
+                placeholder="Search destinations, cities, or activities..." 
+                autocomplete="off"
+              />
             </div>
-            <button type="button" class="filter-toggle">
-              <i class="fas fa-sliders-h"></i>
-              Filters
+            <button type="button" class="filter-toggle" onclick="toggleFilters()">
+              <i class="fas fa-sliders-h"></i> Filters
             </button>
             <button type="submit" class="search-button">
-              <i class="fas fa-search"></i>
-              Search
+              <i class="fas fa-search"></i> Search
             </button>
           </div>
-
-          <div class="search-filters">
-            <div class="filter-group">
-              <label for="destination-type">Destination Type</label>
-              <select id="destination-type" name="type" class="form-select">
-                <option value="">All Types</option>
-                <option value="Beach">Beaches</option>
-                <option value="Mountain">Mountains</option>
-                <option value="Heritage">Heritage Sites</option>
-                <option value="Wildlife">Wildlife</option>
-                <option value="Pilgrimage">Pilgrimage</option>
-              </select>
-            </div>
-
+          <div class="search-filters" id="searchFilters" style="display: none;">
             <div class="filter-group">
               <label for="state">State</label>
-              <select id="state" name="state" class="form-select">
+              <select name="state" id="state">
                 <option value="">All States</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Kerala">Kerala</option>
-                <option value="Goa">Goa</option>
-                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                <option value="Uttarakhand">Uttarakhand</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
+                {% for state_option in all_states %}
+                  {% if state_option %}
+                    <option value="{{ state_option }}">{{ state_option }}</option>
+                  {% endif %}
+                {% endfor %}
               </select>
             </div>
-
             <div class="filter-group">
-              <label for="budget">Budget Range</label>
-              <select id="budget" name="budget" class="form-select">
-                <option value="">Any Budget</option>
-                <option value="budget">Budget Friendly</option>
-                <option value="mid-range">Mid Range</option>
-                <option value="luxury">Luxury</option>
+              <label for="type">Type</label>
+              <select name="type" id="type">
+                <option value="">All Types</option>
+                {% for type_option in all_types %}
+                  {% if type_option %}
+                    <option value="{{ type_option }}">{{ type_option }}</option>
+                  {% endif %}
+                {% endfor %}
               </select>
             </div>
-
             <div class="filter-group">
-              <label for="duration">Duration</label>
-              <select id="duration" name="duration" class="form-select">
-                <option value="">Any Duration</option>
-                <option value="weekend">Weekend Getaway (1-3 days)</option>
-                <option value="short">Short Trip (4-7 days)</option>
-                <option value="long">Extended Trip (8+ days)</option>
+              <label for="significance">Significance</label>
+              <select name="significance" id="significance">
+                <option value="">All Significances</option>
+                {% for significance_option in all_significances %}
+                  {% if significance_option %}
+                    <option value="{{ significance_option }}">{{ significance_option }}</option>
+                  {% endif %}
+                {% endfor %}
               </select>
+            </div>
+            <div class="filter-group">
+              <label for="sort">Sort By</label>
+              <select name="sort" id="sort">
+                <option value="relevance">Relevance</option>
+                <option value="rating">Rating (High to Low)</option>
+                <option value="name">Name (A-Z)</option>
+                <option value="state">State (A-Z)</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button type="submit" class="filter-apply-button">
+                <i class="fas fa-check"></i> Apply Filters
+              </button>
+              <button type="button" class="filter-reset-button" onclick="resetFilters()">
+                <i class="fas fa-times"></i> Reset
+              </button>
             </div>
           </div>
         </form>
@@ -905,16 +949,59 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Filter toggle functionality
+      // Initialize filters state
       const filterToggle = document.querySelector('.filter-toggle');
-      const searchFilters = document.querySelector('.search-filters');
+      const searchFilters = document.getElementById('searchFilters');
       
       if (filterToggle && searchFilters) {
-        filterToggle.addEventListener('click', function() {
-          searchFilters.classList.toggle('show');
-        });
+        // Check if filters should be shown (e.g., if there was a previous search with filters)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('state') || urlParams.has('type') || urlParams.has('significance') || urlParams.has('sort')) {
+          searchFilters.style.display = 'grid';
+          searchFilters.classList.add('show');
+        }
       }
     });
+    
+    // Toggle search filters visibility
+    function toggleFilters() {
+      const filters = document.getElementById("searchFilters");
+      if (filters) {
+        if (filters.classList.contains('show')) {
+          filters.classList.remove('show');
+          setTimeout(() => {
+            filters.style.display = 'none';
+          }, 10);
+        } else {
+          filters.style.display = 'grid';
+          setTimeout(() => {
+            filters.classList.add('show');
+          }, 10);
+        }
+      }
+    }
+    
+    // Reset all filters and submit the form
+    function resetFilters() {
+      const form = document.getElementById('searchForm');
+      if (!form) return;
+      
+      const selects = form.querySelectorAll('select');
+      const searchInput = form.querySelector('input[name="q"]');
+      
+      // Reset all select elements to their first option
+      selects.forEach(select => {
+        select.selectedIndex = 0;
+      });
+      
+      // Clear the search input
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      
+      // Submit the form
+      form.submit();
+    }
   </script>
 </body>
 </html>

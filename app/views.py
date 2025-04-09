@@ -18,7 +18,19 @@ from django.urls import reverse
 def index(request):
     user = request.user
     places = PlaceMode.objects.all()
-    return render(request, 'home-professional.html', {"places" : places[0: 3], 'user': user})
+    
+    # Get all available states, types, and significances for filter dropdowns
+    all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
+    all_types = PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type')
+    all_significances = PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance')
+    
+    return render(request, 'home-professional.html', {
+        "places": places[0: 6],
+        'user': user,
+        'all_states': all_states,
+        'all_types': all_types,
+        'all_significances': all_significances
+    })
 
 
 
@@ -93,15 +105,15 @@ def details(request, pk):
             recommended_places = fallback_recommendations
             recommendation_source = "fallback"
 
-        # Get crowd data for the place
-        crowd_data = CrowdModel.objects.filter(location=place)
+        # Get crowd data for the place - use select_related to reduce queries
+        crowd_data = CrowdModel.objects.filter(location=place).select_related('location')
         
         # List of all months for display
         months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December']
         
-        # Get reviews for the place
-        reviews = TripReview.objects.filter(place=place).order_by('-created_at')
+        # Get reviews for the place - use select_related to reduce queries
+        reviews = TripReview.objects.filter(place=place).select_related('user').order_by('-created_at')
 
         # Show appropriate message based on recommendation source
         if recommendation_source == "fallback":
@@ -131,41 +143,76 @@ def search_view(request):
         place_type = request.GET.get('type', '').strip()
         significance = request.GET.get('significance', '').strip()
         sort_by = request.GET.get('sort', 'relevance').strip()
-
-        # Start with all places
-        results = PlaceMode.objects.all()
+        offset = int(request.GET.get('offset', 0))
+        is_ajax = request.GET.get('ajax', 'false').lower() == 'true'
+        
+        # Results per page
+        results_per_page = 20
 
         # Track which filters were applied for better messaging
         applied_filters = []
         
-        # Apply text search if provided
+        # Start with a QuerySet for more efficient database operations
+        results = PlaceMode.objects.all()
+        
+        # Apply text search if provided - using database filtering for better performance
         if query:
             applied_filters.append(f'search term "{query}"')
-            results = results.filter(
+            
+            # First try exact matches with higher priority
+            exact_matches = PlaceMode.objects.filter(
+                models.Q(Name__iexact=query) |
+                models.Q(City__iexact=query) |
+                models.Q(State__iexact=query)
+            )
+            
+            # Then try partial matches
+            partial_matches = PlaceMode.objects.filter(
                 models.Q(Name__icontains=query) |
                 models.Q(City__icontains=query) |
                 models.Q(State__icontains=query) |
                 models.Q(Significance__icontains=query) |
                 models.Q(Type__icontains=query) |
                 models.Q(Description__icontains=query)
-            )
-
+            ).exclude(id__in=exact_matches.values_list('id', flat=True))
+            
+            # Combine results with exact matches first
+            # Use union to keep it as a QuerySet for as long as possible
+            if exact_matches.exists():
+                results = list(exact_matches) + list(partial_matches)
+            else:
+                results = list(partial_matches)
+        
+        # Apply filters using database operations when possible
         # Apply state filter if provided
         if state:
             applied_filters.append(f'state "{state}"')
-            results = results.filter(State__iexact=state)
+            if isinstance(results, list):
+                results = [place for place in results if place.State and place.State.lower() == state.lower()]
+            else:
+                results = results.filter(State__iexact=state)
 
         # Apply type filter if provided
         if place_type:
             applied_filters.append(f'type "{place_type}"')
-            results = results.filter(Type__iexact=place_type)
+            if isinstance(results, list):
+                results = [place for place in results if place.Type and place.Type.lower() == place_type.lower()]
+            else:
+                results = results.filter(Type__iexact=place_type)
             
         # Apply significance filter if provided
         if significance:
             applied_filters.append(f'significance "{significance}"')
-            results = results.filter(Significance__iexact=significance)
+            if isinstance(results, list):
+                results = [place for place in results if place.Significance and place.Significance.lower() == significance.lower()]
+            else:
+                results = results.filter(Significance__iexact=significance)
 
-        # Apply sorting
+        # Convert to list if still a QuerySet for consistent handling
+        if not isinstance(results, list):
+            results = list(results)
+            
+        # Apply sorting - optimize with database sorting when possible
         if sort_by == 'rating':
             # Sort by Google rating (convert to float first if possible)
             results = sorted(
@@ -175,10 +222,10 @@ def search_view(request):
             )
         elif sort_by == 'name':
             # Sort by name alphabetically
-            results = sorted(results, key=lambda x: x.Name)
+            results = sorted(results, key=lambda x: x.Name.lower() if x.Name else '')
         elif sort_by == 'state':
             # Sort by state alphabetically
-            results = sorted(results, key=lambda x: x.State)
+            results = sorted(results, key=lambda x: x.State.lower() if x.State else '')
         # Default is relevance, which is the default order from the database query
 
         # Check if no results found
@@ -187,7 +234,7 @@ def search_view(request):
             if len(applied_filters) == 1:
                 message = f'No destinations found for {applied_filters[0]}. Try different search criteria or browse our featured destinations.'
             else:
-                filters_text = ", ".join(applied_filters[:-1]) + " and " + applied_filters[-1]
+                filters_text = ", ".join(applied_filters[:-1]) + " and " + applied_filters[-1] if len(applied_filters) > 1 else applied_filters[0]
                 message = f'No destinations match the combination of {filters_text}. Try adjusting your filters.'
 
             messages.info(request, message)
@@ -197,9 +244,20 @@ def search_view(request):
                 try:
                     profile = Profile.objects.get(user=request.user)
                     if profile.fav_type:
-                        recommended = PlaceMode.objects.filter(Type__iexact=profile.fav_type)[:4]
+                        recommended = list(PlaceMode.objects.filter(Type__iexact=profile.fav_type)[:8])
                         if recommended:
                             messages.info(request, f"Here are some {profile.fav_type} destinations you might enjoy based on your preferences.")
+                            
+                            # For AJAX requests, return JSON
+                            if is_ajax:
+                                return JsonResponse({
+                                    'places': [serialize_place(place) for place in recommended],
+                                    'count': len(recommended),
+                                    'has_more': False,
+                                    'no_results': True,
+                                    'recommended': True
+                                })
+                                
                             return render(
                                 request,
                                 'search-page.html',
@@ -212,7 +270,10 @@ def search_view(request):
                                     'sort': sort_by,
                                     'no_results': True,
                                     'recommended': True,
-                                    'recommendation_type': 'personalized'
+                                    'recommendation_type': 'personalized',
+                                    'all_states': PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State'),
+                                    'all_types': PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type'),
+                                    'all_significances': PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance'),
                                 }
                             )
                 except Profile.DoesNotExist:
@@ -220,6 +281,17 @@ def search_view(request):
 
             # Provide some recommended places instead (random selection)
             recommended = list(PlaceMode.objects.order_by('?')[:8])
+            
+            # For AJAX requests, return JSON
+            if is_ajax:
+                return JsonResponse({
+                    'places': [serialize_place(place) for place in recommended],
+                    'count': len(recommended),
+                    'has_more': False,
+                    'no_results': True,
+                    'recommended': True
+                })
+                
             return render(
                 request,
                 'search-page.html',
@@ -232,43 +304,85 @@ def search_view(request):
                     'sort': sort_by,
                     'no_results': True,
                     'recommended': True,
-                    'recommendation_type': 'general'
+                    'recommendation_type': 'general',
+                    'all_states': PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State'),
+                    'all_types': PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type'),
+                    'all_significances': PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance'),
                 }
             )
 
-        # Get all available states and types for filter dropdowns
+        # Get all available states and types for filter dropdowns - cache these values
         all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
         all_types = PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type')
         all_significances = PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance')
+        
+        # Calculate pagination
+        total_results = len(results)
+        paginated_results = results[offset:offset + results_per_page]
+        has_more = (offset + results_per_page) < total_results
+        
+        # For AJAX requests, return JSON
+        if is_ajax:
+            return JsonResponse({
+                'places': [serialize_place(place) for place in paginated_results],
+                'count': total_results,
+                'has_more': has_more
+            })
 
         return render(
             request,
             'search-page.html',
             {
-                'places': results,
+                'places': paginated_results,
                 'query': query,
                 'state': state,
                 'type': place_type,
                 'significance': significance,
                 'sort': sort_by,
-                'count': len(results),
+                'count': total_results,
                 'all_states': all_states,
                 'all_types': all_types,
                 'all_significances': all_significances,
-                'applied_filters': applied_filters
+                'applied_filters': applied_filters,
+                'has_more': has_more
             }
         )
     except Exception as e:
         # Log the error for debugging
         print(f"Search error: {str(e)}")
+        
+        # For AJAX requests, return error JSON
+        if request.GET.get('ajax', 'false').lower() == 'true':
+            return JsonResponse({
+                'error': 'An error occurred while processing your search.',
+                'places': []
+            }, status=500)
+            
         messages.error(request, "An error occurred while processing your search. Please try again.")
         
         # Return a safe fallback with some popular destinations
-        popular_places = PlaceMode.objects.all().order_by('-Google_rating')[:12]
+        popular_places = list(PlaceMode.objects.all().order_by('-Google_rating')[:12])
         return render(request, 'search-page.html', {
             'places': popular_places,
-            'error_occurred': True
+            'error_occurred': True,
+            'all_states': PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State'),
+            'all_types': PlaceMode.objects.values_list('Type', flat=True).distinct().order_by('Type'),
+            'all_significances': PlaceMode.objects.values_list('Significance', flat=True).distinct().order_by('Significance'),
         })
+
+# Helper function to serialize place objects for JSON response
+def serialize_place(place):
+    return {
+        'id': place.id,
+        'name': place.Name,
+        'city': place.City,
+        'state': place.State,
+        'type': place.Type,
+        'description': place.Description[:100] if place.Description else '',
+        'rating': place.Google_rating,
+        'image_url': place.Image_url,
+        'significance': place.Significance
+    }
 
 def signup_view(request):
     if request.method == 'POST':
@@ -286,9 +400,18 @@ def signup_view(request):
                     'email': email
                 })
 
-            # Validate username length
+            # Validate username length and format
+            import re
             if len(username) < 3:
                 messages.error(request, '❌ Username must be at least 3 characters long.')
+                return render(request, 'signup.html', {
+                    'username': username,
+                    'email': email
+                })
+                
+            # Check username format (alphanumeric and underscore only)
+            if not re.match(r'^[a-zA-Z0-9_]+$', username):
+                messages.error(request, '❌ Username can only contain letters, numbers, and underscores.')
                 return render(request, 'signup.html', {
                     'username': username,
                     'email': email
@@ -301,6 +424,14 @@ def signup_view(request):
                     'email': email
                 })
 
+            # Validate email format
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+                messages.error(request, '❌ Please enter a valid email address.')
+                return render(request, 'signup.html', {
+                    'username': username,
+                    'email': email
+                })
+
             # Check if email already exists
             if User.objects.filter(email=email).exists():
                 messages.error(request, '❌ An account with this email already exists. Please use a different email or try logging in.')
@@ -308,9 +439,17 @@ def signup_view(request):
                     'username': username
                 })
 
-            # Validate password length
+            # Validate password length and complexity
             if len(password1) < 8:
                 messages.error(request, '❌ Password must be at least 8 characters long.')
+                return render(request, 'signup.html', {
+                    'username': username,
+                    'email': email
+                })
+                
+            # Check password complexity
+            if not (re.search(r'[A-Z]', password1) and re.search(r'[a-z]', password1) and re.search(r'[0-9]', password1)):
+                messages.error(request, '❌ Password must contain at least one uppercase letter, one lowercase letter, and one number.')
                 return render(request, 'signup.html', {
                     'username': username,
                     'email': email
@@ -327,11 +466,22 @@ def signup_view(request):
             # Create user
             user = User.objects.create_user(username=username, email=email, password=password1)
             user.save()
+            
+            # Create an empty profile for the user
+            try:
+                profile = Profile(user=user)
+                profile.save()
+            except Exception as profile_error:
+                print(f"Error creating profile: {str(profile_error)}")
+                # Continue even if profile creation fails - we'll handle it later
+            
+            # Log the user in
             login(request, user)
             messages.success(request, "✅ Welcome to TripInsight! Your registration was successful. Please complete your profile to get personalized recommendations.")
             return redirect('create_profile')
 
         except Exception as e:
+            print(f"Signup error: {str(e)}")
             messages.error(request, '❌ An error occurred during registration. Please try again.')
             return render(request, 'signup.html')
 
@@ -346,11 +496,26 @@ def login_view(request):
 
     # Get the next parameter if it exists
     next_url = request.GET.get('next', 'index')
+    
+    # Make sure next_url is a valid URL name or path
+    if next_url and not next_url.startswith('/') and next_url != 'index':
+        next_url = '/' + next_url
+    
+    # If next_url is just a name without slash, assume it's a named URL
+    if next_url and not next_url.startswith('/') and next_url != 'index':
+        try:
+            # Try to reverse the URL name
+            from django.urls import reverse
+            next_url = reverse(next_url)
+        except:
+            # If reverse fails, default to index
+            next_url = 'index'
 
     if request.method == 'POST':
         try:
             username = request.POST.get('username', '').strip()
             password = request.POST.get('password', '')
+            remember_me = request.POST.get('remember', False)
 
             # Validate inputs
             if not username or not password:
@@ -358,10 +523,8 @@ def login_view(request):
                 return render(request, 'login-new.html', {'username': username, 'next': next_url})
 
             # Check if user exists first
-            if not User.objects.filter(username=username).exists():
-                messages.error(request, '❌ This username does not exist. Please check your username or sign up for a new account.')
-                return render(request, 'login-new.html', {'username': username, 'next': next_url})
-
+            user_exists = User.objects.filter(username=username).exists()
+            
             # Try to authenticate
             user = authenticate(request, username=username, password=password)
 
@@ -372,15 +535,28 @@ def login_view(request):
                     return render(request, 'login-new.html', {'username': username, 'next': next_url})
 
                 login(request, user)
-                messages.success(request, '✅ Login successful! Welcome back, ' + user.username + '.')
+                
+                # Set session expiry based on remember me checkbox
+                if remember_me:
+                    # Session will last for 2 weeks
+                    request.session.set_expiry(1209600)
+                else:
+                    # Session will end when browser is closed
+                    request.session.set_expiry(0)
+                    
+                messages.success(request, f'✅ Login successful! Welcome back, {user.username}.')
 
                 # Redirect to the next URL or home
                 return redirect(next_url)
             else:
-                messages.error(request, '❌ Incorrect password. Please try again or use the forgot password option.')
+                if user_exists:
+                    messages.error(request, '❌ Incorrect password. Please try again.')
+                else:
+                    messages.error(request, '❌ This username does not exist. Please check your username or sign up for a new account.')
                 return render(request, 'login-new.html', {'username': username, 'next': next_url})
 
         except Exception as e:
+            print(f"Login error: {str(e)}")
             messages.error(request, '❌ An error occurred during login. Please try again.')
             return render(request, 'login-new.html', {'next': next_url})
 
@@ -388,29 +564,47 @@ def login_view(request):
 
 # Logout View
 def logout_view(request):
-    if request.user.is_authenticated:
-        username = request.user.username
-        logout(request)
-        messages.success(request, f'✅ You have been successfully logged out. Thanks for visiting, {username}!')
-    else:
-        messages.info(request, 'You were not logged in.')
+    try:
+        if request.user.is_authenticated:
+            username = request.user.username
+            logout(request)
+            messages.success(request, f'✅ You have been successfully logged out. Thanks for visiting, {username}!')
+        else:
+            messages.info(request, 'You were not logged in.')
 
-    # Redirect to the page they came from, or home if not available
-    next_url = request.GET.get('next', 'index')
-    return redirect(next_url)
+        # Get the referrer URL to redirect back to the page they came from
+        referrer = request.META.get('HTTP_REFERER')
+        
+        # If referrer exists and is from our site, redirect there
+        if referrer and request.get_host() in referrer:
+            # Strip the domain part to get just the path
+            from urllib.parse import urlparse
+            path = urlparse(referrer).path
+            return redirect(path)
+            
+        # Otherwise redirect to the specified next URL or home
+        next_url = request.GET.get('next', 'index')
+        return redirect(next_url)
+    except Exception as e:
+        print(f"Logout error: {str(e)}")
+        messages.error(request, "An error occurred during logout.")
+        return redirect('index')
 
 # Initialize Google Maps client with API key from settings
 try:
     # Get API key from settings (which now loads from .env)
     GOOGLE_MAPS_API_KEY = getattr(settings, 'GOOGLE_MAPS_API_KEY', None)
     
-    if GOOGLE_MAPS_API_KEY:
+    if GOOGLE_MAPS_API_KEY and GOOGLE_MAPS_API_KEY.strip():
         gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
         print("Google Maps API initialized successfully.")
     else:
-        print("Google Maps API key not found. Distance calculations will be disabled.")
-        print("Run 'python setup_api_key.py' to configure your API key.")
+        print("Google Maps API key not found or empty. Distance calculations will be disabled.")
+        print("Set GOOGLE_MAPS_API_KEY in your .env file or environment variables.")
         gmaps = None
+except ImportError:
+    print("Google Maps library not installed. Run 'pip install googlemaps' to enable distance calculations.")
+    gmaps = None
 except Exception as e:
     # Log the error but don't crash the application
     print(f"Error initializing Google Maps client: {e}")
@@ -520,11 +714,52 @@ def estimate_cost(request):
         distance_km = get_distance(origin, destination)
 
         if distance_km is None:
-            return JsonResponse({
-                "error": "Could not calculate distance between the provided locations",
-                "status": "error",
-                "suggestion": "Please check the spelling of your origin and destination"
-            }, status=400)
+            # If Google Maps API fails, provide a fallback distance calculation
+            # This is a very rough estimate based on coordinates
+            try:
+                # Try to parse coordinates from origin and destination
+                if ',' in origin and ',' in destination:
+                    # Extract coordinates
+                    origin_parts = origin.split(',')
+                    dest_parts = destination.split(',')
+                    
+                    if len(origin_parts) >= 2 and len(dest_parts) >= 2:
+                        try:
+                            # Calculate rough distance using Haversine formula
+                            from math import radians, cos, sin, asin, sqrt
+                            
+                            # Parse coordinates
+                            lat1 = float(origin_parts[0].strip())
+                            lon1 = float(origin_parts[1].strip())
+                            lat2 = float(dest_parts[0].strip())
+                            lon2 = float(dest_parts[1].strip())
+                            
+                            # Convert to radians
+                            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+                            
+                            # Haversine formula
+                            dlon = lon2 - lon1
+                            dlat = lat2 - lat1
+                            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+                            c = 2 * asin(sqrt(a))
+                            r = 6371  # Radius of Earth in kilometers
+                            distance_km = c * r
+                            
+                            print(f"Using fallback distance calculation: {distance_km} km")
+                        except Exception as e:
+                            print(f"Error in fallback distance calculation: {e}")
+                            distance_km = None
+            except Exception as e:
+                print(f"Error in fallback distance calculation: {e}")
+                distance_km = None
+                
+            # If still no distance, return error
+            if distance_km is None:
+                return JsonResponse({
+                    "error": "Could not calculate distance between the provided locations",
+                    "status": "error",
+                    "suggestion": "Please check the spelling of your origin and destination or try again later"
+                }, status=400)
 
         # Calculate costs for different travel modes
         # Car cost calculation (fuel + tolls)
@@ -880,6 +1115,11 @@ def stories(request):
             count=models.Count('travel_medium')
         ).order_by('-count')
         
+        # Get user's reviews if authenticated
+        user_reviews = None
+        if request.user.is_authenticated:
+            user_reviews = TripReview.objects.filter(user=request.user).order_by('-created_at')
+        
         context = {
             "reviews": reviews,
             "featured_reviews": featured_reviews,
@@ -888,7 +1128,8 @@ def stories(request):
             "selected_medium": travel_medium,
             "selected_state": state,
             "selected_sort": sort_by,
-            "travel_medium_choices": TripReview.TRAVEL_MEDIUM_CHOICES
+            "travel_medium_choices": TripReview.TRAVEL_MEDIUM_CHOICES,
+            "user_reviews": user_reviews
         }
         
         return render(request, "stories-new.html", context)

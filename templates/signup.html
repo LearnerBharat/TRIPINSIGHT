@@ -6,21 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - TripInsight</title>
     <meta name="description" content="Create your TripInsight account to explore the diverse beauty of India, plan your trips, and share your experiences.">
-    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
-    <link rel="stylesheet" href="{% static 'css/transitions.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="{% static 'js/navbar.js' %}" defer></script>
-    <script src="{% static 'js/transitions.js' %}" defer></script>
 
     <style>
+      :root {
+        --primary-color: #508D4E;
+        --secondary-color: #1A5319;
+        --accent-color: #80AF81;
+        --light-color: #D6EFD8;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --footer-bg: #333;
+        --footer-link: #ccc;
+        --border-radius: 12px;
+      }
         body {
             background-color: var(--light-gray);
             margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 0 !important; /* Override the padding-top set by navbar.js */
         }
 
       .signup-section {
@@ -28,7 +42,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 60px 0;
+        padding: 120px 0 60px 0; /* Increased top padding to account for navbar */
+        margin-top: 0; /* Reset any margin */
       }
 
       .signup-container {
@@ -92,7 +107,7 @@
         box-shadow: 0 0 0 2px rgba(52, 121, 40, 0.1);
       }
 
-      .signup-button {
+      .form-signup-button {
         background-color: var(--primary-color);
         color: white;
         padding: 14px;
@@ -106,12 +121,12 @@
         margin-bottom: 25px;
       }
 
-      .signup-button:hover {
+      .form-signup-button:hover {
         background-color: var(--secondary-color);
         transform: translateY(-2px);
       }
 
-      .signup-button:active {
+      .form-signup-button:active {
         transform: translateY(0);
       }
 
@@ -239,7 +254,7 @@
                         <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm your password" required>
                     </div>
 
-                    <button type="submit" class="signup-button">Create Account</button>
+                    <button type="submit" class="form-signup-button">Create Account</button>
                 </form>
 
                 <div class="terms-text">
@@ -253,7 +268,7 @@
         </div>
     </section>
 
-
+    {% include 'includes/footer.html' %}
 
     <script>
       // Add authentication class to body if user is authenticated
@@ -261,6 +276,28 @@
         {% if user.is_authenticated %}
           document.body.classList.add('user-authenticated');
         {% endif %}
+        
+        // Adjust signup section padding based on navbar height
+        setTimeout(function() {
+          const navbar = document.querySelector('.navbar');
+          const signupSection = document.querySelector('.signup-section');
+          
+          if (navbar && signupSection) {
+            const navbarHeight = navbar.offsetHeight;
+            signupSection.style.paddingTop = (navbarHeight + 40) + 'px';
+          }
+        }, 200); // Wait for navbar to be fully initialized
+      });
+      
+      // Also adjust on window resize
+      window.addEventListener('resize', function() {
+        const navbar = document.querySelector('.navbar');
+        const signupSection = document.querySelector('.signup-section');
+        
+        if (navbar && signupSection) {
+          const navbarHeight = navbar.offsetHeight;
+          signupSection.style.paddingTop = (navbarHeight + 40) + 'px';
+        }
       });
     </script>
   </body>

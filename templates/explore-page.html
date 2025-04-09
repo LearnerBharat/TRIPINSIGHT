@@ -100,9 +100,16 @@
                 <span>{{ i.Google_rating }}</span>
               </div>
               {% endif %}
-              <a href="/details/{{ i.id }}" class="card-link">
-                Explore <i class="fa-solid fa-arrow-right"></i>
-              </a>
+              <div class="card-actions">
+                <a href="/details/{{ i.id }}" class="card-link">
+                  Explore <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="/submit-review/{{ i.id }}" class="card-link share-link">
+                  <i class="fa-solid fa-pen"></i> Share Story
+                </a>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>

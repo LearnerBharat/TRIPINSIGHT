@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     <link rel="stylesheet" href="{% static 'css/transitions.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reviews-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'css/best-time-enhanced.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="{% static 'js/navbar.js' %}" defer></script>
@@ -1113,11 +1115,11 @@
                         </div>
                         {% if user.is_authenticated %}
                         <a href="{% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn">
-                            <i class="fas fa-edit"></i> Write a Review
+                            <i class="fas fa-pen"></i> Share Your Story
                         </a>
                         {% else %}
                         <a href="{% url 'login' %}?next={% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn">
-                            <i class="fas fa-edit"></i> Login to Write a Review
+                            <i class="fas fa-sign-in-alt"></i> Login to Share Your Story
                         </a>
                         {% endif %}
                     </div>
@@ -1146,15 +1148,14 @@
                                     </div>
                                 </div>
                                 <div class="review-content">
-                                    <h5>{{ review.title }}</h5>
-                                    <p>{{ review.description }}</p>
+                                    <div class="review-text">{{ review.description }}</div>
                                     
                                     <div class="review-details">
                                         <div class="review-detail">
                                             <i class="fas fa-users"></i> Group Size: {{ review.no_of_people }}
                                         </div>
                                         <div class="review-detail">
-                                            <i class="fas fa-plane-departure"></i> Travel: {{ review.get_travel_medium_display }}
+                                            <i class="fas fa-plane-departure"></i> Travel: {{ review.travel_medium }}
                                         </div>
                                         <div class="review-detail">
                                             <i class="fas fa-ticket-alt"></i> Travel Cost: ₹{{ review.travel_cost }}
@@ -1175,6 +1176,15 @@
                             <div class="no-reviews">
                                 <i class="fas fa-comment-slash"></i>
                                 <p>No reviews yet. Be the first to share your experience!</p>
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn" style="margin-top: 15px;">
+                                    <i class="fas fa-pen"></i> Share Your Story
+                                </a>
+                                {% else %}
+                                <a href="{% url 'login' %}?next={% url 'submit_trip_review' pk=single_place.id %}" class="write-review-btn" style="margin-top: 15px;">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Share Your Story
+                                </a>
+                                {% endif %}
                             </div>
                         {% endif %}
                     </div>
@@ -1190,21 +1200,35 @@
                     </div>
                     
                     <h3>Visitor Traffic by Month</h3>
+                    <div class="month-legend">
+                        <div class="legend-item">
+                            <span class="legend-color low"></span>
+                            <span class="legend-text">Optimal Season</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color medium"></span>
+                            <span class="legend-text">Favorable Period</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color high"></span>
+                            <span class="legend-text">Peak Tourist Season</span>
+                        </div>
+                    </div>
                     <div class="month-map">
                         {% for i in crowd_data %}
                         {% if i.crowd_count == 1 %}
                         <div class="month low">
-                            <span>{{ i.month }}</span>
-                            <div class="crowd-level">Low Season</div>
+                            <span>{{ i.month_name }}</span>
+                            <div class="crowd-level">Optimal</div>
                         </div>
                         {% elif i.crowd_count == 2 %}
                         <div class="month medium">
-                            <span>{{ i.month }}</span>
-                            <div class="crowd-level">Moderate</div>
+                            <span>{{ i.month_name }}</span>
+                            <div class="crowd-level">Favorable</div>
                         </div>
                         {% else %}
                         <div class="month high">
-                            <span>{{ i.month }}</span>
+                            <span>{{ i.month_name }}</span>
                             <div class="crowd-level">Peak Season</div>
                         </div>
                         {% endif %}
@@ -1213,34 +1237,372 @@
                     
                     <div class="weather-info">
                         <h3>Weather Information</h3>
-                        <p>{{ single_place.Name }} experiences a subtropical climate with distinct seasons. Here's what to expect throughout the year:</p>
+                        <p>{{ single_place.Name }} experiences weather patterns typical of {{ single_place.State }}. Here's what to expect throughout the year:</p>
                         
                         <div class="weather-grid">
-                            <div class="weather-card">
-                                <h4>Winter (Oct-Mar)</h4>
-                                <div class="weather-icon">
-                                    <i class="fas fa-sun"></i>
+                            {% if single_place.State == "Rajasthan" or single_place.State == "Gujarat" or single_place.State == "Delhi" or single_place.State == "Haryana" or single_place.State == "Punjab" %}
+                                <!-- North & Western India Weather -->
+                                <div class="weather-card">
+                                    <h4>Winter (Nov-Feb)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <div class="weather-temp">5°C - 20°C</div>
+                                    <div class="weather-desc">Cool & Pleasant</div>
                                 </div>
-                                <div class="weather-temp">15°C - 25°C</div>
-                                <div class="weather-desc">Pleasant & Comfortable</div>
-                            </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Summer (Mar-Jun)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-temperature-high"></i>
+                                    </div>
+                                    <div class="weather-temp">35°C - 48°C</div>
+                                    <div class="weather-desc">Very Hot & Dry</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Monsoon (Jul-Sep)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-cloud-rain"></i>
+                                    </div>
+                                    <div class="weather-temp">25°C - 35°C</div>
+                                    <div class="weather-desc">Moderate Rainfall</div>
+                                </div>
+                            {% elif single_place.State == "Kerala" or single_place.State == "Karnataka" or single_place.State == "Tamil Nadu" or single_place.State == "Andhra Pradesh" or single_place.State == "Goa" %}
+                                <!-- South India Weather -->
+                                <div class="weather-card">
+                                    <h4>Winter (Dec-Feb)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <div class="weather-temp">20°C - 30°C</div>
+                                    <div class="weather-desc">Warm & Pleasant</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Summer (Mar-May)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-temperature-high"></i>
+                                    </div>
+                                    <div class="weather-temp">30°C - 40°C</div>
+                                    <div class="weather-desc">Hot & Humid</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Monsoon (Jun-Sep)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-cloud-showers-heavy"></i>
+                                    </div>
+                                    <div class="weather-temp">25°C - 30°C</div>
+                                    <div class="weather-desc">Heavy Rainfall</div>
+                                </div>
+                            {% elif single_place.State == "Himachal Pradesh" or single_place.State == "Uttarakhand" or single_place.State == "Jammu and Kashmir" or single_place.State == "Sikkim" %}
+                                <!-- Himalayan Region Weather -->
+                                <div class="weather-card">
+                                    <h4>Winter (Nov-Feb)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-snowflake"></i>
+                                    </div>
+                                    <div class="weather-temp">-10°C - 10°C</div>
+                                    <div class="weather-desc">Cold & Snowy</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Summer (Mar-Jun)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <div class="weather-temp">15°C - 30°C</div>
+                                    <div class="weather-desc">Pleasant & Cool</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Monsoon (Jul-Sep)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-cloud-rain"></i>
+                                    </div>
+                                    <div class="weather-temp">10°C - 25°C</div>
+                                    <div class="weather-desc">Rainy & Landslides</div>
+                                </div>
+                            {% else %}
+                                <!-- Default/Central India Weather -->
+                                <div class="weather-card">
+                                    <h4>Winter (Nov-Feb)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <div class="weather-temp">10°C - 25°C</div>
+                                    <div class="weather-desc">Pleasant & Comfortable</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Summer (Mar-Jun)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-temperature-high"></i>
+                                    </div>
+                                    <div class="weather-temp">30°C - 42°C</div>
+                                    <div class="weather-desc">Hot & Dry</div>
+                                </div>
+                                
+                                <div class="weather-card">
+                                    <h4>Monsoon (Jul-Sep)</h4>
+                                    <div class="weather-icon">
+                                        <i class="fas fa-cloud-rain"></i>
+                                    </div>
+                                    <div class="weather-temp">25°C - 35°C</div>
+                                    <div class="weather-desc">Humid & Rainy</div>
+                                </div>
+                            {% endif %}
                             
                             <div class="weather-card">
-                                <h4>Summer (Apr-Jun)</h4>
+                                <h4>Post-Monsoon (Oct-Nov)</h4>
                                 <div class="weather-icon">
-                                    <i class="fas fa-temperature-high"></i>
+                                    <i class="fas fa-cloud-sun"></i>
                                 </div>
-                                <div class="weather-temp">30°C - 45°C</div>
-                                <div class="weather-desc">Hot & Dry</div>
+                                <div class="weather-temp">20°C - 30°C</div>
+                                <div class="weather-desc">Pleasant & Clear</div>
                             </div>
-                            
-                            <div class="weather-card">
-                                <h4>Monsoon (Jul-Sep)</h4>
-                                <div class="weather-icon">
-                                    <i class="fas fa-cloud-rain"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Region-specific travel advice -->
+                    <div class="region-weather">
+                        <h3>Regional Travel Tips</h3>
+                        <div class="region-tabs">
+                            <button class="region-tab active" data-region="general">General</button>
+                            <button class="region-tab" data-region="clothing">What to Pack</button>
+                            <button class="region-tab" data-region="activities">Activities</button>
+                            <button class="region-tab" data-region="festivals">Festivals</button>
+                        </div>
+                        
+                        <div class="region-content active" id="general-content">
+                            <div class="region-info">
+                                <p>{{ single_place.Name }} is best visited during the winter months when the weather is most comfortable for sightseeing and outdoor activities. If you're planning to visit during monsoon, be prepared for occasional travel disruptions.</p>
+                                
+                                {% if crowd_data %}
+                                    {% with low_crowd_months=crowd_data|dictsortreversed:"crowd_count"|slice:":3" %}
+                                        {% if low_crowd_months %}
+                                            <p>The months with typically lower visitor traffic are:
+                                            {% for month in low_crowd_months %}
+                                                {{ month.month_name }}{% if not forloop.last %}{% if forloop.counter == low_crowd_months|length|add:"-1" %} and {% else %}, {% endif %}{% endif %}
+                                            {% endfor %}
+                                            making them ideal for a more peaceful experience.</p>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <p>For the most comfortable experience, consider visiting outside of peak holiday seasons and weekends.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="region-content" id="clothing-content">
+                            <div class="region-info">
+                                <p>What to pack for your visit to {{ single_place.Name }} depends on the season:</p>
+                                
+                                {% if single_place.State == "Himachal Pradesh" or single_place.State == "Uttarakhand" or single_place.State == "Jammu and Kashmir" or single_place.State == "Sikkim" %}
+                                    <!-- Himalayan Region Packing -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Heavy woolens, thermal wear, snow boots, gloves, muffler, warm cap</li>
+                                        <li><strong>Summer:</strong> Light woolens for evenings, comfortable walking shoes, sunglasses, sunscreen</li>
+                                        <li><strong>Monsoon:</strong> Waterproof jacket, umbrella, waterproof hiking boots, quick-dry clothes</li>
+                                    </ul>
+                                {% elif single_place.State == "Rajasthan" or single_place.State == "Gujarat" %}
+                                    <!-- Desert Region Packing -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Light to medium woolens, jacket, comfortable walking shoes</li>
+                                        <li><strong>Summer:</strong> Lightweight cotton clothes, scarf/hat for sun protection, sunglasses, high SPF sunscreen, water bottle</li>
+                                        <li><strong>Monsoon:</strong> Light cotton clothes, umbrella, waterproof footwear</li>
+                                    </ul>
+                                {% elif single_place.State == "Kerala" or single_place.State == "Goa" %}
+                                    <!-- Coastal Region Packing -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Light cotton clothes, light jacket for evenings, comfortable sandals</li>
+                                        <li><strong>Summer:</strong> Lightweight breathable clothes, swimwear, hat, sunglasses, high SPF sunscreen, insect repellent</li>
+                                        <li><strong>Monsoon:</strong> Quick-dry clothes, umbrella, waterproof sandals, rain jacket, insect repellent</li>
+                                    </ul>
+                                {% else %}
+                                    <!-- Default Packing List -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Light woolens, jacket, comfortable walking shoes</li>
+                                        <li><strong>Summer:</strong> Light cotton clothes, sunglasses, hat, sunscreen, water bottle</li>
+                                        <li><strong>Monsoon:</strong> Umbrella, raincoat, waterproof footwear, quick-dry clothes</li>
+                                    </ul>
+                                {% endif %}
+                                
+                                <p class="mt-3"><strong>General items:</strong> Comfortable walking shoes, basic medications, camera, power bank, and appropriate clothing for religious sites (covered shoulders and knees).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="region-content" id="activities-content">
+                            <div class="region-info">
+                                <p>Seasonal activities in and around {{ single_place.Name }}:</p>
+                                
+                                {% if single_place.State == "Himachal Pradesh" or single_place.State == "Uttarakhand" or single_place.State == "Jammu and Kashmir" or single_place.State == "Sikkim" %}
+                                    <!-- Himalayan Region Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Snow activities (skiing, snowboarding), winter treks, hot springs, photography of snow-capped mountains</li>
+                                        <li><strong>Summer:</strong> Trekking, camping, paragliding, river rafting, mountain biking, wildlife spotting</li>
+                                        <li><strong>Monsoon:</strong> Indoor cultural experiences, spa retreats, photography (with caution due to landslides)</li>
+                                    </ul>
+                                {% elif single_place.State == "Rajasthan" or single_place.State == "Gujarat" %}
+                                    <!-- Desert Region Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Desert safaris, camel rides, cultural tours, fort visits, outdoor photography</li>
+                                        <li><strong>Summer:</strong> Early morning/evening heritage walks, indoor museums, shopping for handicrafts, cultural performances</li>
+                                        <li><strong>Monsoon:</strong> Bird watching, photography of desert landscapes turning green, cultural experiences</li>
+                                    </ul>
+                                {% elif single_place.State == "Kerala" or single_place.State == "Goa" %}
+                                    <!-- Coastal Region Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Beach activities, water sports, boat cruises, wildlife sanctuaries, cultural tours</li>
+                                        <li><strong>Summer:</strong> Early morning beach walks, ayurvedic treatments, indoor cultural experiences, cooking classes</li>
+                                        <li><strong>Monsoon:</strong> Ayurvedic treatments, watching the rain from seaside cafes, photography of lush landscapes</li>
+                                    </ul>
+                                {% elif single_place.Type == "Hill Station" %}
+                                    <!-- Hill Station Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Scenic viewpoints, nature walks, photography, local cuisine exploration</li>
+                                        <li><strong>Summer:</strong> Trekking, boating, horseback riding, visiting tea/coffee plantations</li>
+                                        <li><strong>Monsoon:</strong> Watching waterfalls, misty landscape photography, indoor cultural experiences</li>
+                                    </ul>
+                                {% elif single_place.Type == "Historical" or single_place.Type == "Heritage" %}
+                                    <!-- Historical Site Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Guided tours, architectural photography, light & sound shows, historical walks</li>
+                                        <li><strong>Summer:</strong> Early morning/evening tours, museum visits, indoor historical sites</li>
+                                        <li><strong>Monsoon:</strong> Photography of monuments against dramatic skies, indoor historical exhibits</li>
+                                    </ul>
+                                {% else %}
+                                    <!-- Default Activities -->
+                                    <ul>
+                                        <li><strong>Winter:</strong> Sightseeing, photography, outdoor activities, local cuisine exploration</li>
+                                        <li><strong>Summer:</strong> Indoor attractions, early morning/evening outings, cultural experiences</li>
+                                        <li><strong>Monsoon:</strong> Lush landscape photography, indoor museums, cultural performances</li>
+                                    </ul>
+                                {% endif %}
+                                
+                                <div class="highlight-list mt-3">
+                                    <span class="highlight-tag"><i class="fas fa-info-circle"></i> Activities may vary based on current weather conditions</span>
+                                    <span class="highlight-tag"><i class="fas fa-calendar-check"></i> Check for seasonal closures before planning</span>
                                 </div>
-                                <div class="weather-temp">25°C - 35°C</div>
-                                <div class="weather-desc">Humid & Rainy</div>
+                            </div>
+                        </div>
+                        
+                        <div class="region-content" id="festivals-content">
+                            <div class="region-info">
+                                <p>Major festivals and events in {{ single_place.State }} that might enhance your visit:</p>
+                                
+                                {% if single_place.State == "Rajasthan" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Desert Festival (January/February)</h4>
+                                            <p>Experience the vibrant culture of Jaisalmer with camel races, folk performances, and turban tying competitions.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Pushkar Camel Fair (November)</h4>
+                                            <p>One of the world's largest camel fairs with trading, competitions, and cultural performances.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Teej (August)</h4>
+                                            <p>Celebrates the arrival of monsoon with swings, traditional songs, and processions.</p>
+                                        </div>
+                                    </div>
+                                {% elif single_place.State == "Kerala" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Onam (August/September)</h4>
+                                            <p>Kerala's harvest festival featuring boat races, floral decorations (pookalam), and the grand Onam Sadya feast.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Thrissur Pooram (April/May)</h4>
+                                            <p>Spectacular temple festival with decorated elephants, traditional percussion, and fireworks.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Snake Boat Races (August-November)</h4>
+                                            <p>Witness the famous Nehru Trophy Boat Race and other competitions on Kerala's backwaters.</p>
+                                        </div>
+                                    </div>
+                                {% elif single_place.State == "Goa" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Carnival (February/March)</h4>
+                                            <p>Colorful parades, music, dance, and festivities before the Lenten season.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Shigmo (March)</h4>
+                                            <p>Traditional spring festival with folk dances, street performances, and colorful processions.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Christmas & New Year (December)</h4>
+                                            <p>Experience Goa's unique blend of Indian and Portuguese traditions with midnight mass, beach parties, and fireworks.</p>
+                                        </div>
+                                    </div>
+                                {% elif single_place.State == "Himachal Pradesh" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Kullu Dussehra (October)</h4>
+                                            <p>Seven-day festival where local deities are brought in procession to pay homage to Lord Raghunath.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Winter Snow Festival (January)</h4>
+                                            <p>Celebrated in Manali with skiing competitions, folk performances, and snow sculpture contests.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Mandi Shivratri Fair (March)</h4>
+                                            <p>Week-long international fair with processions of local deities and cultural performances.</p>
+                                        </div>
+                                    </div>
+                                {% elif single_place.State == "Tamil Nadu" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Pongal (January)</h4>
+                                            <p>Four-day harvest festival with special dishes, decorated cattle, and traditional games.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Madurai Chithirai Festival (April/May)</h4>
+                                            <p>Grand celebration of the celestial wedding of Goddess Meenakshi and Lord Sundareswarar.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Dance Festival (December/January)</h4>
+                                            <p>Classical dance performances at the ancient Mamallapuram monuments.</p>
+                                        </div>
+                                    </div>
+                                {% elif single_place.State == "West Bengal" %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Durga Puja (September/October)</h4>
+                                            <p>Bengal's biggest festival with elaborate pandals, cultural performances, and processions.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Poush Mela (December)</h4>
+                                            <p>Traditional fair in Shantiniketan with folk music, Baul singers, and handicrafts.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Gangasagar Mela (January)</h4>
+                                            <p>Pilgrimage and holy dip at the confluence of the Ganges and the Bay of Bengal.</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="festival-list">
+                                        <div class="festival-item">
+                                            <h4>Diwali (October/November)</h4>
+                                            <p>Festival of lights celebrated with oil lamps, fireworks, and family gatherings.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Holi (March)</h4>
+                                            <p>Festival of colors with water and colored powders, music, and traditional sweets.</p>
+                                        </div>
+                                        <div class="festival-item">
+                                            <h4>Navratri (September/October)</h4>
+                                            <p>Nine nights of dance and worship dedicated to the goddess Durga.</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="highlight-list mt-4">
+                                    <span class="highlight-tag"><i class="fas fa-calendar-alt"></i> Festival dates vary yearly (based on lunar calendar)</span>
+                                    <span class="highlight-tag"><i class="fas fa-ticket-alt"></i> Book accommodations in advance during festivals</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1272,6 +1634,25 @@
                 });
             });
             
+            // Region tabs functionality
+            const regionTabs = document.querySelectorAll('.region-tab');
+            const regionContents = document.querySelectorAll('.region-content');
+            
+            regionTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    regionTabs.forEach(t => t.classList.remove('active'));
+                    regionContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const regionId = this.getAttribute('data-region');
+                    document.getElementById(`${regionId}-content`).classList.add('active');
+                });
+            });
+            
             // Add CSS for the review elements
             const style = document.createElement('style');
             style.textContent = `
@@ -1281,7 +1662,7 @@
                     justify-content: center;
                     gap: 8px;
                     padding: 12px 20px;
-                    background-color: var(--primary-color);
+                    background-color: #2e7d32;
                     color: white;
                     border: none;
                     border-radius: var(--border-radius);
@@ -1290,12 +1671,13 @@
                     cursor: pointer;
                     transition: var(--transition);
                     text-decoration: none;
+                    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
                 }
                 
                 .write-review-btn:hover {
-                    background-color: var(--primary-dark);
+                    background-color: #1b5e20;
                     transform: translateY(-2px);
-                    box-shadow: var(--hover-shadow);
+                    box-shadow: 0 6px 15px rgba(46, 125, 50, 0.3);
                 }
                 
                 .review-content h5 {
@@ -1345,20 +1727,23 @@
                     align-items: center;
                     justify-content: center;
                     padding: 40px;
-                    background-color: var(--lightest-color);
+                    background-color: rgba(46, 125, 50, 0.05);
+                    border: 1px dashed rgba(46, 125, 50, 0.3);
                     border-radius: var(--border-radius);
                     text-align: center;
                 }
                 
                 .no-reviews i {
                     font-size: 48px;
-                    color: var(--text-muted);
+                    color: #2e7d32;
                     margin-bottom: 15px;
+                    opacity: 0.7;
                 }
                 
                 .no-reviews p {
-                    color: var(--text-light);
+                    color: var(--text-color);
                     font-size: 16px;
+                    margin-bottom: 10px;
                 }
             `;
             document.head.appendChild(style);

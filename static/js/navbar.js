@@ -1,11 +1,14 @@
 // Modern navbar functionality with error handling
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a short time to ensure authentication class is added
+    // Use a longer timeout for pages that might need more time to initialize
     setTimeout(function() {
         try {
             // Insert the navbar into all pages
             const body = document.body;
+            // Check for authentication in multiple ways to ensure it works
             const isAuthenticated = document.body.classList.contains('user-authenticated');
+            console.log('Authentication state:', isAuthenticated);
 
         // Create navbar element
         const navbar = document.createElement('nav');
@@ -20,29 +23,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="nav-menu">
                     <div class="nav-links">
                         <a href="/" class="nav-link">Home</a>
-                        <a href="/explore" class="nav-link">Explore</a>
-                        <a href="/stories" class="nav-link">Travel Stories</a>
-                        <a href="/about" class="nav-link">About Us</a>
+                        <a href="/explore/" class="nav-link">Explore</a>
+                        <a href="/stories/" class="nav-link">Travel Stories</a>
+                        <a href="/about/" class="nav-link">About Us</a>
                     </div>
                     <div class="nav-actions">
                         ${
                             isAuthenticated ?
                             `
-                            <a href="/profile" class="nav-button">
+                            <a href="/profile/" class="nav-button">
                                 <i class="fa-solid fa-user"></i>
                                 <span>Profile</span>
                             </a>
-                            <a href="/logout" class="nav-button">
+                            <a href="/logout/" class="nav-button logout-button">
                                 <i class="fa-solid fa-sign-out-alt"></i>
                                 <span>Logout</span>
                             </a>
                             ` :
                             `
-                            <a href="/signup" class="nav-button">
+                            <a href="/signup/" class="nav-button nav-signup-button">
                                 <i class="fa-solid fa-user-plus"></i>
                                 <span>Sign Up</span>
                             </a>
-                            <a href="/login" class="nav-button">
+                            <a href="/login/" class="nav-button nav-login-button">
                                 <i class="fa-solid fa-sign-in-alt"></i>
                                 <span>Login</span>
                             </a>
@@ -64,29 +67,29 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenu.innerHTML = `
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <a href="/explore" class="nav-link">Explore</a>
-                <a href="/stories" class="nav-link">Travel Stories</a>
-                <a href="/about" class="nav-link">About Us</a>
+                <a href="/explore/" class="nav-link">Explore</a>
+                <a href="/stories/" class="nav-link">Travel Stories</a>
+                <a href="/about/" class="nav-link">About Us</a>
             </div>
             <div class="nav-actions">
                 ${
                     isAuthenticated ?
                     `
-                    <a href="/profile" class="nav-button">
+                    <a href="/profile/" class="nav-button">
                         <i class="fa-solid fa-user"></i>
                         <span>Profile</span>
                     </a>
-                    <a href="/logout" class="nav-button">
+                    <a href="/logout/" class="nav-button logout-button">
                         <i class="fa-solid fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>
                     ` :
                     `
-                    <a href="/signup" class="nav-button">
+                    <a href="/signup/" class="nav-button nav-signup-button">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Sign Up</span>
                     </a>
-                    <a href="/login" class="nav-button">
+                    <a href="/login/" class="nav-button nav-login-button">
                         <i class="fa-solid fa-sign-in-alt"></i>
                         <span>Login</span>
                     </a>
@@ -229,5 +232,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.insertBefore(fallbackNavbar, document.body.firstChild);
             }
         }
-    }, 50); // Small delay to ensure authentication class is added
+    }, 100); // Increased delay to ensure authentication class is added
 });

@@ -6,21 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - TripInsight</title>
     <meta name="description" content="Login to your TripInsight account to explore the diverse beauty of India, plan your trips, and share your experiences.">
-    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
-    <link rel="stylesheet" href="{% static 'css/transitions.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="{% static 'js/navbar.js' %}" defer></script>
-    <script src="{% static 'js/transitions.js' %}" defer></script>
 
     <style>
+      :root {
+        --primary-color: #508D4E;
+        --secondary-color: #1A5319;
+        --accent-color: #80AF81;
+        --light-color: #D6EFD8;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --footer-bg: #333;
+        --footer-link: #ccc;
+        --border-radius: 12px;
+      }
         body {
             background-color: var(--light-gray);
             margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 0 !important; /* Override the padding-top set by navbar.js */
         }
 
       .login-section {
@@ -28,7 +42,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 60px 0;
+        padding: 120px 0 60px 0; /* Increased top padding to account for navbar */
+        margin-top: 0; /* Reset any margin */
       }
 
       .login-container {
@@ -128,7 +143,7 @@
         color: var(--dark-gray);
       }
 
-      .login-button {
+      .form-login-button {
         background-color: var(--primary-color);
         color: white;
         padding: 14px;
@@ -142,75 +157,16 @@
         margin-bottom: 25px;
       }
 
-      .login-button:hover {
+      .form-login-button:hover {
         background-color: var(--secondary-color);
         transform: translateY(-2px);
       }
 
-      .login-button:active {
+      .form-login-button:active {
         transform: translateY(0);
       }
 
-      .divider {
-        display: flex;
-        align-items: center;
-        margin: 25px 0;
-        color: var(--dark-gray);
-        font-size: 0.9rem;
-      }
 
-      .divider::before,
-      .divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--medium-gray);
-      }
-
-      .divider span {
-        padding: 0 15px;
-      }
-
-      .social-login {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-bottom: 25px;
-      }
-
-      .social-login-button {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 10px;
-        border-radius: var(--border-radius);
-        border: 1px solid var(--medium-gray);
-        background: white;
-        color: var(--dark-gray);
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: var(--transition);
-        text-decoration: none;
-      }
-
-      .social-login-button:hover {
-        background: var(--light-gray);
-        transform: translateY(-2px);
-      }
-
-      .social-login-button i {
-        font-size: 18px;
-      }
-
-      .google-login i {
-        color: #DB4437;
-      }
-
-      .facebook-login i {
-        color: #4267B2;
-      }
 
       .login-footer {
         margin-top: 30px;
@@ -271,10 +227,6 @@
         .login-header h1 {
           font-size: 1.8rem;
         }
-
-        .social-login {
-          flex-direction: column;
-        }
       }
     </style>
   </head>
@@ -321,21 +273,10 @@
                         <label for="remember">Remember me</label>
                     </div>
 
-                    <button type="submit" class="login-button">Login</button>
+                    <button type="submit" class="form-login-button">Login</button>
                 </form>
 
-                <div class="divider"><span>or continue with</span></div>
 
-                <div class="social-login">
-                    <a href="#" class="social-login-button google-login">
-                        <i class="fab fa-google"></i>
-                        <span>Google</span>
-                    </a>
-                    <a href="#" class="social-login-button facebook-login">
-                        <i class="fab fa-facebook-f"></i>
-                        <span>Facebook</span>
-                    </a>
-                </div>
 
                 <div class="login-footer">
                     <p>Don't have an account? <a href="/signup">Sign up</a></p>
@@ -344,7 +285,7 @@
         </div>
     </section>
 
-
+    {% include 'includes/footer.html' %}
 
     <script>
       // Add authentication class to body if user is authenticated
@@ -352,6 +293,28 @@
         {% if user.is_authenticated %}
           document.body.classList.add('user-authenticated');
         {% endif %}
+        
+        // Adjust login section padding based on navbar height
+        setTimeout(function() {
+          const navbar = document.querySelector('.navbar');
+          const loginSection = document.querySelector('.login-section');
+          
+          if (navbar && loginSection) {
+            const navbarHeight = navbar.offsetHeight;
+            loginSection.style.paddingTop = (navbarHeight + 40) + 'px';
+          }
+        }, 200); // Wait for navbar to be fully initialized
+      });
+      
+      // Also adjust on window resize
+      window.addEventListener('resize', function() {
+        const navbar = document.querySelector('.navbar');
+        const loginSection = document.querySelector('.login-section');
+        
+        if (navbar && loginSection) {
+          const navbarHeight = navbar.offsetHeight;
+          loginSection.style.paddingTop = (navbarHeight + 40) + 'px';
+        }
       });
     </script>
   </body>

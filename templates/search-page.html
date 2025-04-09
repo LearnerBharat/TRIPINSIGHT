@@ -1,19 +1,33 @@
 {% load static %} {% load custom_filters %}
+<!-- Authentication state: {{ user.is_authenticated }} -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TripInsight - Discover Incredible India</title>
-    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/transitions.css' %}" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <script src="{% static 'js/navbar.js' %}" defer></script>
-    <script src="{% static 'js/transitions.js' %}" defer></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripInsight - Discover Incredible India</title>
+  <meta name="description" content="Explore the diverse beauty of India with TripInsight. Find destinations, read travel stories, and plan your perfect trip.">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/transitions.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="{% static 'js/navbar.js' %}" defer></script>
+  <script src="{% static 'js/transitions.js' %}" defer></script>
+  <script>
+    // Ensure navbar.js is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if navbar was created
+      setTimeout(function() {
+        if (!document.querySelector('.navbar')) {
+          console.log('Navbar not found, reloading script');
+          const navbarScript = document.createElement('script');
+          navbarScript.src = "{% static 'js/navbar.js' %}";
+          document.head.appendChild(navbarScript);
+        }
+      }, 100);
+    });
+  </script>
     <style>
       :root {
         --primary-color: #347928;
@@ -28,7 +42,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Poppins', sans-serif;
       }
       body {
         background-color: #fff;
@@ -39,79 +53,13 @@
         margin: 0 auto;
         padding: 0 20px;
       }
-      /* Navbar Styles */
-      .navbar {
-        background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1000;
-      }
-      .navbar .container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 70px;
-      }
-      .nav-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--primary-color);
-      }
-      .nav-brand i {
-        font-size: 28px;
-      }
-      .nav-links {
-        display: flex;
-        gap: 32px;
-      }
-      .nav-links a {
-        text-decoration: none;
-        color: var(--text-color);
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-      .nav-links a:hover,
-      .nav-links a.active {
-        color: var(--primary-color);
-      }
-      .nav-button {
-        padding: 10px 24px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: var(--border-radius);
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-left: 12px;
-      }
-      .nav-button:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-2px);
-      }
-      .nav-button a {
-        color: white;
-        text-decoration: none;
-      }
-      .nav-links-box-2 {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+      /* We're using the navbar.css styles instead of custom navbar styles */
       /* Hero Section */
       .hero {
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
           url("https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3")
             center/cover;
-        min-height: 700px;
+        min-height: 500px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -133,13 +81,13 @@
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
       }
       .search-container {
-        background: rgba(255, 255, 255, 0.95);
+        background: white;
         border-radius: var(--border-radius);
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        width: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
         max-width: 800px;
         margin: 0 auto;
+        position: relative;
       }
       .search-box {
         display: flex;
@@ -150,10 +98,15 @@
         flex: 1;
         display: flex;
         align-items: center;
-        background: white;
-        border-radius: 8px;
-        padding: 0 16px;
-        border: 2px solid #eee;
+        background: var(--light-gray);
+        border-radius: var(--border-radius);
+        padding: 0 15px;
+        transition: var(--transition);
+        border: 1px solid var(--medium-gray);
+      }
+      .search-input:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: var(--focus-shadow);
       }
       .search-input i {
         color: var(--primary-color);
@@ -205,20 +158,15 @@
         transform: translateY(-2px);
       }
       .search-filters {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        display: none;
+        grid-template-columns: repeat(4, 1fr);
         gap: 20px;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transition: all 0.3s ease;
-      }
-      .search-filters.show {
-        max-height: 500px;
-        opacity: 1;
         margin-top: 20px;
         padding-top: 20px;
         border-top: 1px solid #eee;
+      }
+      .search-filters.show {
+        display: grid;
       }
       .filter-group {
         display: flex;
@@ -244,7 +192,48 @@
       .filter-group select:focus {
         border-color: var(--primary-color);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 93, 93, 0.1);
+        box-shadow: 0 0 0 3px rgba(52, 121, 40, 0.2);
+      }
+      
+      .filter-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        justify-content: center;
+      }
+      
+      .filter-apply-button, .filter-reset-button {
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .filter-apply-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+      }
+      
+      .filter-apply-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      
+      .filter-reset-button {
+        background-color: white;
+        color: var(--text-color);
+        border: 1px solid var(--medium-gray);
+      }
+      
+      .filter-reset-button:hover {
+        background-color: var(--light-gray);
+        transform: translateY(-2px);
       }
       /* Destinations Section */
       .destinations {
@@ -262,6 +251,17 @@
       .section-header p {
         color: #666;
         font-size: 18px;
+      }
+      .applied-filters {
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: var(--light-color);
+        border-radius: 8px;
+        display: inline-block;
+      }
+      .applied-filters p {
+        font-size: 14px;
+        color: var(--primary-color);
       }
       .destination-grid {
         display: grid;
@@ -316,39 +316,116 @@
       }
       .experience-card {
         background: white;
-        border-radius: var(--border-radius);
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        position: relative;
       }
       .experience-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      }
+      .experience-card:hover img {
+        transform: scale(1.05);
       }
       .experience-card img {
         width: 100%;
-        height: 200px;
+        height: 220px;
         object-fit: cover;
+        transition: transform 0.5s ease;
       }
       .experience-card .card-content {
         position: static;
         background: white;
         color: var(--text-color);
-        padding: 20px;
+        padding: 24px;
+        height: calc(100% - 220px);
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid rgba(0,0,0,0.05);
       }
       .tag {
         display: inline-block;
-        padding: 4px 12px;
-        background: var(--secondary-color);
-        color: white;
-        border-radius: 20px;
-        font-size: 14px;
-        margin-bottom: 12px;
+        padding: 6px 14px;
+        background: rgba(52, 121, 40, 0.1);
+        color: var(--primary-color);
+        border-radius: 30px;
+        font-size: 13px;
+        margin-bottom: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
       }
       .price {
-        color: var(--primary-color);
+        color: var(--text-color);
         font-weight: 600;
-        margin-top: 12px;
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 16px;
+        border-top: 1px dashed rgba(0,0,0,0.05);
+        margin-top: 16px;
+      }
+      .rating {
+        background-color: rgba(255, 215, 0, 0.15);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #b38c00;
+      }
+      .rating i {
+        color: #FFD700;
+        margin-right: 4px;
+      }
+      
+      .experience-card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: var(--text-color);
+        font-weight: 700;
+        line-height: 1.3;
+      }
+      
+      .experience-card p {
+        color: #666;
+        font-size: 15px;
+        margin-bottom: 16px;
+        line-height: 1.5;
+        flex-grow: 1;
+      }
+      .no-results {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .load-more-container {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .load-more-button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 14px 36px;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(52, 121, 40, 0.2);
+        font-size: 16px;
+        letter-spacing: 0.5px;
+      }
+      .load-more-button:hover {
+        background: #33a25c;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(52, 121, 40, 0.3);
       }
       /* Footer */
       .footer {
@@ -451,74 +528,389 @@
           gap: 30px;
         }
       }
-      .nav-button a {
-        color: white;
-        text-decoration: none;
-      }
       a {
         text-decoration: none;
       }
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .experience-card {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      .experience-card:nth-child(2) { animation-delay: 0.1s; }
+      .experience-card:nth-child(3) { animation-delay: 0.2s; }
+      .experience-card:nth-child(4) { animation-delay: 0.3s; }
+      .experience-card:nth-child(5) { animation-delay: 0.4s; }
+      .experience-card:nth-child(6) { animation-delay: 0.5s; }
     </style>
   </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="container">
-        <div class="nav-brand">
-          <span>TripInsight</span>
-        </div>
-        <div class="nav-links-box-2">
-          <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="#">About</a>
-            <a href="#">Explore</a>
-            <a href="#">Travel Stories</a>
-          </div>
-          {% if user.is_authenticated %}
-          <button class="nav-button">
-            <i class="fa-solid fa-user"></i>
-            <a href="/profile">Profile</a>
-          </button>
-          {% else %}
-          <button class="nav-button">
-            <i class="fa-solid fa-user"></i>
-            <a href="/sign-up">Sign In</a>
-          </button>
-          {% endif %}
+  <body class="{% if user.is_authenticated %}user-authenticated{% endif %}">
+    {% include 'includes/notifications.html' %}
+    
+    <!-- Add authentication class immediately to avoid FOUC (Flash of Unauthenticated Content) -->
+    {% if user.is_authenticated %}
+    <script>
+        document.body.classList.add('user-authenticated');
+    </script>
+    {% endif %}
+
+    <!-- Hero Section with Search -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Discover Incredible India</h1>
+        <p>Find your perfect destination from thousands of incredible places</p>
+        <div class="search-container">
+          <form action="{% url 'search' %}" method="GET" id="searchForm">
+            <div class="search-box">
+              <div class="search-input">
+                <i class="fas fa-search"></i>
+                <input 
+                  type="text" 
+                  name="q" 
+                  placeholder="Search destinations, cities, or activities..." 
+                  value="{{ query }}"
+                  autocomplete="off"
+                />
+              </div>
+              <button type="button" class="filter-toggle" id="filterToggle">
+                <i class="fas fa-sliders-h"></i> Filters
+              </button>
+              <button type="submit" class="search-button">
+                <i class="fas fa-search"></i> Search
+              </button>
+            </div>
+            <div class="search-filters" id="searchFilters" style="display: none;">
+              <div class="filter-group">
+                <label for="state">State</label>
+                <select name="state" id="state">
+                  <option value="">All States</option>
+                  {% for state_option in all_states %}
+                    {% if state_option %}
+                      <option value="{{ state_option }}" {% if state == state_option %}selected{% endif %}>{{ state_option }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="type">Type</label>
+                <select name="type" id="type">
+                  <option value="">All Types</option>
+                  {% for type_option in all_types %}
+                    {% if type_option %}
+                      <option value="{{ type_option }}" {% if type == type_option %}selected{% endif %}>{{ type_option }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="significance">Significance</label>
+                <select name="significance" id="significance">
+                  <option value="">All Significances</option>
+                  {% for significance_option in all_significances %}
+                    {% if significance_option %}
+                      <option value="{{ significance_option }}" {% if significance == significance_option %}selected{% endif %}>{{ significance_option }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="sort">Sort By</label>
+                <select name="sort" id="sort">
+                  <option value="relevance" {% if sort == 'relevance' %}selected{% endif %}>Relevance</option>
+                  <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Rating (High to Low)</option>
+                  <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                  <option value="state" {% if sort == 'state' %}selected{% endif %}>State (A-Z)</option>
+                </select>
+              </div>
+              <div class="filter-actions">
+                <button type="submit" class="filter-apply-button">
+                  <i class="fas fa-check"></i> Apply Filters
+                </button>
+                <button type="button" class="filter-reset-button" onclick="resetFilters()">
+                  <i class="fas fa-times"></i> Reset
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-    </nav>
+    </section>
 
-    <!-- Hero Section -->
+    <!-- Results Section -->
     <section class="experiences">
       <div class="container">
         <div class="section-header">
-          <h2>Our Top Places</h2>
-          <p>Curated activities that showcase India's rich heritage</p>
+          {% if query or state or type or significance %}
+            <h2>Search Results</h2>
+            {% if count %}
+              <p>Found {{ count }} destinations matching your search</p>
+              {% if applied_filters %}
+                <div class="applied-filters">
+                  <p>Filters: {{ applied_filters|join:", " }}</p>
+                </div>
+              {% endif %}
+            {% else %}
+              <p>No destinations found matching your criteria</p>
+            {% endif %}
+          {% else %}
+            <h2>Our Top Places</h2>
+            <p>Curated activities that showcase India's rich heritage</p>
+          {% endif %}
         </div>
+        
         <div class="experience-grid">
           {% for i in places %}
-          <a href="details/{{ i.id }}">
+          <a href="{% url 'details' i.id %}">
             <div class="experience-card">
-              <img src="{{ i.Image_url }}" alt="Kerala Backwaters" />
+              <img src="{{ i.Image_url }}" alt="{{ i.Name }}" loading="lazy" />
               <div class="card-content">
-                <span class="tag">Top places</span>
+                <span class="tag">{{ i.Type|default:"Destination" }}</span>
                 <h3>{{ i.Name }}</h3>
                 <p>{{ i.Description|truncatechars:40 }}</p>
-                <div class="price">{{ i.State }}</div>
+                <div class="price">{{ i.State }} {% if i.Google_rating %}<span class="rating"><i class="fas fa-star"></i> {{ i.Google_rating }}</span>{% endif %}</div>
               </div>
             </div>
           </a>
+          {% empty %}
+            <div class="no-results">
+              <p>No destinations found. Try adjusting your search criteria.</p>
+            </div>
           {% endfor %}
         </div>
+        
+        {% if has_more %}
+        <div class="load-more-container">
+          <button id="loadMoreBtn" class="load-more-button">
+            Load More Results
+          </button>
+        </div>
+        {% endif %}
       </div>
     </section>
 
     {% include 'includes/footer.html' %}
     <script>
-      function toggleFilters() {
-        const filters = document.getElementById("searchFilters");
-        filters.classList.toggle("show");
+      // Filter toggle functionality is now handled by navbar.js
+      
+      // Reset all filters and submit the form
+      function resetFilters() {
+        const form = document.getElementById('searchForm');
+        const selects = form.querySelectorAll('select');
+        const searchInput = form.querySelector('input[name="q"]');
+        
+        // Reset all select elements to their first option
+        selects.forEach(select => {
+          select.selectedIndex = 0;
+        });
+        
+        // Clear the search input
+        if (searchInput) {
+          searchInput.value = '';
+        }
+        
+        // Submit the form with reset values
+        form.submit();
+      }
+      
+      // Initialize search page specific functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchFilters = document.getElementById('searchFilters');
+        const filterToggle = document.getElementById('filterToggle');
+        
+        // Show filters if any filter parameters are in the URL
+        if (searchFilters && (urlParams.has('state') || urlParams.has('type') || urlParams.has('significance') || urlParams.has('sort'))) {
+          searchFilters.style.display = 'grid';
+          searchFilters.classList.add('show');
+          
+          // Update filter toggle icon
+          const icon = filterToggle?.querySelector('i');
+          if (icon) {
+            icon.classList.remove('fa-sliders-h');
+            icon.classList.add('fa-times-circle');
+          }
+        }
+        
+        // Add filter toggle functionality
+        if (filterToggle && searchFilters) {
+          filterToggle.addEventListener('click', function() {
+            if (searchFilters.classList.contains('show')) {
+              searchFilters.classList.remove('show');
+              setTimeout(() => {
+                searchFilters.style.display = 'none';
+              }, 10);
+              
+              // Change icon
+              const icon = this.querySelector('i');
+              if (icon) {
+                icon.classList.remove('fa-times-circle');
+                icon.classList.add('fa-sliders-h');
+              }
+            } else {
+              searchFilters.style.display = 'grid';
+              setTimeout(() => {
+                searchFilters.classList.add('show');
+              }, 10);
+              
+              // Change icon
+              const icon = this.querySelector('i');
+              if (icon) {
+                icon.classList.remove('fa-sliders-h');
+                icon.classList.add('fa-times-circle');
+              }
+            }
+          });
+        }
+        
+        // Add event listeners for the load more button
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+          loadMoreBtn.addEventListener('click', loadMoreResults);
+        }
+        
+        // Remove auto-submit on filter change to prevent multiple form submissions
+        // Users will now use the Apply Filters button
+        
+        // Add debounced search for input field
+        const searchInput = document.querySelector('.search-input input');
+        if (searchInput) {
+          let debounceTimer;
+          searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            if (this.value.length >= 3 || this.value.length === 0) {
+              debounceTimer = setTimeout(() => {
+                document.getElementById('searchForm').submit();
+              }, 800); // Wait 800ms after user stops typing
+            }
+          });
+        }
+      });
+      
+      // Function to load more results via AJAX
+      function loadMoreResults() {
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const experienceGrid = document.querySelector('.experience-grid');
+        const currentCount = document.querySelectorAll('.experience-card').length;
+        
+        // Show loading state
+        loadMoreBtn.textContent = 'Loading...';
+        loadMoreBtn.disabled = true;
+        
+        // Get current search parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('offset', currentCount);
+        urlParams.set('ajax', 'true');
+        
+        // Make AJAX request to get more results
+        fetch(`/search/?${urlParams.toString()}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.places && data.places.length > 0) {
+              // Add new places to the grid
+              data.places.forEach(place => {
+                const placeCard = createPlaceCard(place);
+                experienceGrid.appendChild(placeCard);
+              });
+              
+              // Update button state
+              if (!data.has_more) {
+                loadMoreBtn.textContent = 'No More Results';
+                setTimeout(() => {
+                  loadMoreBtn.parentElement.remove();
+                }, 2000);
+              } else {
+                loadMoreBtn.textContent = 'Load More Results';
+                loadMoreBtn.disabled = false;
+              }
+            } else {
+              // No more results
+              loadMoreBtn.textContent = 'No More Results';
+              setTimeout(() => {
+                loadMoreBtn.parentElement.remove();
+              }, 2000);
+            }
+          })
+          .catch(error => {
+            console.error('Error loading more results:', error);
+            loadMoreBtn.textContent = 'Error Loading Results. Try Again';
+            loadMoreBtn.disabled = false;
+            
+            // Add click event to retry
+            loadMoreBtn.addEventListener('click', function retryHandler() {
+              loadMoreBtn.removeEventListener('click', retryHandler);
+              loadMoreResults();
+            }, { once: true });
+          });
+      }
+      
+      // Helper function to create a place card element
+      function createPlaceCard(place) {
+        const cardWrapper = document.createElement('a');
+        cardWrapper.href = `/details/${place.id}/`;
+        
+        const card = document.createElement('div');
+        card.className = 'experience-card';
+        card.style.animation = 'fadeIn 0.5s ease-out forwards';
+        
+        const img = document.createElement('img');
+        img.src = place.image_url || 'https://via.placeholder.com/300x200?text=No+Image';
+        img.alt = place.name;
+        img.loading = 'lazy';
+        img.onerror = function() {
+          this.src = 'https://via.placeholder.com/300x200?text=Image+Error';
+        };
+        
+        const content = document.createElement('div');
+        content.className = 'card-content';
+        
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = place.type || 'Destination';
+        
+        const title = document.createElement('h3');
+        title.textContent = place.name || 'Unnamed Destination';
+        
+        const desc = document.createElement('p');
+        if (place.description) {
+          desc.textContent = place.description.length > 40 ? 
+            place.description.substring(0, 40) + '...' : place.description;
+        } else {
+          desc.textContent = 'No description available';
+        }
+        
+        const price = document.createElement('div');
+        price.className = 'price';
+        price.textContent = place.state || 'Unknown Location';
+        
+        if (place.rating) {
+          const rating = document.createElement('span');
+          rating.className = 'rating';
+          
+          const star = document.createElement('i');
+          star.className = 'fas fa-star';
+          
+          rating.appendChild(star);
+          rating.appendChild(document.createTextNode(' ' + place.rating));
+          price.appendChild(rating);
+        }
+        
+        content.appendChild(tag);
+        content.appendChild(title);
+        content.appendChild(desc);
+        content.appendChild(price);
+        
+        card.appendChild(img);
+        card.appendChild(content);
+        cardWrapper.appendChild(card);
+        
+        return cardWrapper;
       }
     </script>
   </body>

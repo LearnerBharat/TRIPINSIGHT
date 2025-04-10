@@ -65,6 +65,30 @@
           <span>Adventure</span>
         </a>
       </div>
+      
+      <!-- State Filters -->
+      <div class="state-filters">
+        <div class="state-filter-header">
+          <h3>Popular States</h3>
+        </div>
+        <div class="state-filter-buttons">
+          <a href="?state=Maharashtra" class="state-filter-btn {% if request.GET.state == 'Maharashtra' %}active{% endif %}">
+            Maharashtra
+          </a>
+          <a href="?state=Goa" class="state-filter-btn {% if request.GET.state == 'Goa' %}active{% endif %}">
+            Goa
+          </a>
+          <a href="?state=Kerala" class="state-filter-btn {% if request.GET.state == 'Kerala' %}active{% endif %}">
+            Kerala
+          </a>
+          <a href="?state=Rajasthan" class="state-filter-btn {% if request.GET.state == 'Rajasthan' %}active{% endif %}">
+            Rajasthan
+          </a>
+          <a href="?state=Himachal Pradesh" class="state-filter-btn {% if request.GET.state == 'Himachal Pradesh' %}active{% endif %}">
+            Himachal Pradesh
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -80,7 +104,23 @@
         {% for i in places %}
         <div class="destination-card">
           <div class="card-img-container">
-            <img src="{{ i.Image_url }}" alt="{{ i.Name }}">
+            {% if i.Image_url and "http" in i.Image_url %}
+            <img src="{{ i.Image_url }}" alt="{{ i.Name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
+            {% elif i.Type == 'beach' %}
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% elif i.Type == 'mountain' %}
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% elif i.Type == 'heritage' %}
+            <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% elif i.Type == 'wildlife' %}
+            <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% elif i.Type == 'pilgrimage' %}
+            <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% elif i.Type == 'adventure' %}
+            <img src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% else %}
+            <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ i.Name }}">
+            {% endif %}
             {% if i.Type %}
             <div class="card-badge">{{ i.Type }}</div>
             {% endif %}
@@ -105,11 +145,6 @@
                 <a href="/details/{{ i.id }}" class="card-link">
                   Explore <i class="fa-solid fa-arrow-right"></i>
                 </a>
-                {% if user.is_authenticated %}
-                <a href="/submit-review/{{ i.id }}" class="card-link share-link">
-                  <i class="fa-solid fa-pen"></i> Share Story
-                </a>
-                {% endif %}
               </div>
             </div>
           </div>
@@ -133,7 +168,23 @@
             <div class="featured-large">
               <div class="featured-card">
                 <a href="/details/{{ featured.id }}">
-                  <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}">
+                  {% if featured.Image_url and "http" in featured.Image_url %}
+                  <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
+                  {% elif featured.Type == 'beach' %}
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'mountain' %}
+                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'heritage' %}
+                  <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'wildlife' %}
+                  <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'pilgrimage' %}
+                  <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'adventure' %}
+                  <img src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% else %}
+                  <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="{{ featured.Name }}">
+                  {% endif %}
                   <div class="featured-overlay">
                     <h3 class="featured-title">{{ featured.Name }}</h3>
                     <div class="featured-location">
@@ -150,7 +201,23 @@
             <div class="featured-small">
               <div class="featured-card">
                 <a href="/details/{{ featured.id }}">
-                  <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}">
+                  {% if featured.Image_url and "http" in featured.Image_url %}
+                  <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
+                  {% elif featured.Type == 'beach' %}
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'mountain' %}
+                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'heritage' %}
+                  <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'wildlife' %}
+                  <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'pilgrimage' %}
+                  <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% elif featured.Type == 'adventure' %}
+                  <img src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% else %}
+                  <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="{{ featured.Name }}">
+                  {% endif %}
                   <div class="featured-overlay">
                     <h3 class="featured-title">{{ featured.Name }}</h3>
                     <div class="featured-location">
@@ -166,7 +233,7 @@
           <!-- Fallback if no featured places are available -->
           <div class="featured-large">
             <div class="featured-card">
-              <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3" alt="Taj Mahal">
+              <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Taj Mahal">
               <div class="featured-overlay">
                 <h3 class="featured-title">Taj Mahal: A Monument of Love</h3>
                 <div class="featured-location">
@@ -179,7 +246,7 @@
 
           <div class="featured-small">
             <div class="featured-card">
-              <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3" alt="Goa Beaches">
+              <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Goa Beaches">
               <div class="featured-overlay">
                 <h3 class="featured-title">Beaches of Goa</h3>
                 <div class="featured-location">
@@ -192,7 +259,7 @@
 
           <div class="featured-small">
             <div class="featured-card">
-              <img src="https://images.unsplash.com/photo-1544123311-8b5abd81a437?ixlib=rb-4.0.3" alt="Kerala Backwaters">
+              <img src="https://images.unsplash.com/photo-1544123311-8b5abd81a437?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Kerala Backwaters">
               <div class="featured-overlay">
                 <h3 class="featured-title">Kerala Backwaters</h3>
                 <div class="featured-location">
@@ -209,12 +276,82 @@
 
 
 
+  <style>
+    /* Image loading animation */
+    .card-img-container, .featured-card {
+      position: relative;
+      overflow: hidden;
+      background-color: #f0f0f0;
+    }
+    
+    .card-img-container::before, .featured-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+      animation: loading-shimmer 1.5s infinite;
+      z-index: 1;
+    }
+    
+    .card-img-container img, .featured-card img {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .card-img-container img.loaded, .featured-card img.loaded {
+      opacity: 1;
+    }
+    
+    .featured-card.loaded::before, .card-img-container.loaded::before {
+      animation: none;
+      opacity: 0;
+    }
+    
+    @keyframes loading-shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+  </style>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Animate elements on scroll
       const animateElements = document.querySelectorAll('.destination-card, .featured-card');
+      
+      // Handle image loading
+      const images = document.querySelectorAll('.card-img-container img, .featured-card img');
+      images.forEach(img => {
+        // Add loaded class when image is loaded
+        img.addEventListener('load', function() {
+          this.classList.add('loaded');
+          // Remove shimmer effect from parent container
+          if (this.parentElement.classList.contains('card-img-container')) {
+            this.parentElement.classList.add('loaded');
+          }
+          // For featured cards, the image might be deeper in the DOM
+          const featuredCard = this.closest('.featured-card');
+          if (featuredCard) {
+            featuredCard.classList.add('loaded');
+          }
+        });
+        
+        // If image is already loaded (from cache)
+        if (img.complete) {
+          img.classList.add('loaded');
+          if (img.parentElement.classList.contains('card-img-container')) {
+            img.parentElement.classList.add('loaded');
+          }
+          const featuredCard = img.closest('.featured-card');
+          if (featuredCard) {
+            featuredCard.classList.add('loaded');
+          }
+        }
+      });
 
-      // Set initial state
+      // Set initial state for scroll animations
       animateElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -236,8 +373,16 @@
       // Run on page load
       checkScroll();
 
-      // Run on scroll
-      window.addEventListener('scroll', checkScroll);
+      // Run on scroll with throttling for better performance
+      let scrollTimeout;
+      window.addEventListener('scroll', function() {
+        if (!scrollTimeout) {
+          scrollTimeout = setTimeout(function() {
+            checkScroll();
+            scrollTimeout = null;
+          }, 20);
+        }
+      });
 
       // Smooth scroll for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {

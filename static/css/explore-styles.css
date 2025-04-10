@@ -66,6 +66,7 @@
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
+  margin-bottom: 25px;
 }
 
 .filter-item {
@@ -87,6 +88,46 @@
 .filter-item i {
   font-size: 1.2rem;
   color: var(--primary-color);
+}
+
+/* State Filters */
+.state-filters {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.state-filter-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.state-filter-header h3 {
+  font-size: 1.2rem;
+  color: var(--dark-gray);
+  font-weight: 500;
+}
+
+.state-filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.state-filter-btn {
+  padding: 8px 16px;
+  background: var(--light-gray);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.state-filter-btn:hover, .state-filter-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 /* Main Content */
@@ -395,6 +436,17 @@
   }
 
   .filter-item {
+    flex-shrink: 0;
+  }
+  
+  .state-filter-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    justify-content: flex-start;
+  }
+  
+  .state-filter-btn {
     flex-shrink: 0;
   }
 

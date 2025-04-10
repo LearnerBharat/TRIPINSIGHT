@@ -8,9 +8,15 @@ from import_export.widgets import ForeignKeyWidget
 class customer_list(resources.ModelResource):
     class Meta:
         model = PlaceMode
-        fields = ('id', 'Name', 'City', 'Zone', 'Type', 'State', 'Description', 'Year' ,'Time_needed', 'Google_rating', 'Significance', 'Best_time_to_visit', 'Fees')
+        fields = ('id', 'Name', 'City', 'Zone', 'Type', 'State', 'Description', 'Year' ,'Time_needed', 'Google_rating', 'Significance', 'Best_time_to_visit', 'Fees', 'Image_url')
+
 class UserAdmin(ImportExportModelAdmin):
     resource_class = customer_list
+    list_display = ('Name', 'City', 'State', 'Type', 'Google_rating', 'Significance')
+    list_filter = ('State', 'Type', 'Significance')
+    search_fields = ('Name', 'City', 'State', 'Description')
+    ordering = ('Name',)
+
 admin.site.register(PlaceMode, UserAdmin)
 
 class crowd_data(resources.ModelResource):

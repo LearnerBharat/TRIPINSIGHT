@@ -3,6 +3,7 @@ from .models import *
 import pandas as pd
 import pickle
 import os
+import random
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -761,39 +762,39 @@ def estimate_cost(request):
                     "suggestion": "Please check the spelling of your origin and destination or try again later"
                 }, status=400)
 
-        # Calculate costs for different travel modes
-        # Car cost calculation (fuel + tolls)
-        car_cost = distance_km * 10
+        # Calculate costs for different travel modes using more generic estimates
+        # Car cost calculation (fuel + tolls) - more generic range
+        car_cost = distance_km * random.uniform(8, 12)  # Average cost per km with some variation
 
-        # Train cost calculation with tiered pricing
+        # Train cost calculation with tiered pricing - more generic ranges
         if distance_km <= 100:
-            train_cost = distance_km * 6
+            train_cost = distance_km * random.uniform(5, 7)  # Short distance
         elif distance_km <= 500:
-            train_cost = distance_km * 5
+            train_cost = distance_km * random.uniform(4, 6)  # Medium distance
         else:
-            train_cost = distance_km * 4
+            train_cost = distance_km * random.uniform(3, 5)  # Long distance
 
-        # Air cost calculation with tiered pricing
+        # Air cost calculation with tiered pricing - more generic ranges
         if distance_km <= 500:
-            air_cost = distance_km * 15  # Short flights are more expensive per km
+            air_cost = distance_km * random.uniform(12, 18)  # Short flights are more expensive per km
         elif distance_km <= 1000:
-            air_cost = distance_km * 12
+            air_cost = distance_km * random.uniform(10, 14)  # Medium flights
         else:
-            air_cost = distance_km * 10
+            air_cost = distance_km * random.uniform(8, 12)  # Long flights
 
-        # Bus cost calculation
-        bus_cost = distance_km * 3
+        # Bus cost calculation - more generic range
+        bus_cost = distance_km * random.uniform(2, 4)
 
         # Adjust costs for number of people (except car which is shared)
         train_cost *= num_people
         air_cost *= num_people
         bus_cost *= num_people
 
-        # Accommodation cost estimate (per night)
-        accommodation_cost = 1500 * num_people
+        # Accommodation cost estimate (per night) - more generic range
+        accommodation_cost = random.uniform(1200, 1800) * num_people
 
-        # Food cost estimate (per day)
-        food_cost = 500 * num_people
+        # Food cost estimate (per day) - more generic range
+        food_cost = random.uniform(400, 600) * num_people
 
         # Return the estimates
         return JsonResponse({
@@ -1273,15 +1274,15 @@ def api_estimate_costs(request, pk):
             # Calculate total cost (per person per day) - without entry fee
             total_cost = avg_accommodation + avg_food + avg_travel
             
-            # Use default values if any cost is zero
+            # Use more generic default values if any cost is zero
             if avg_accommodation == 0:
-                avg_accommodation = 1500  # Default accommodation cost
+                avg_accommodation = random.uniform(1200, 1800)  # More generic accommodation cost
             
             if avg_food == 0:
-                avg_food = 800  # Default food cost
+                avg_food = random.uniform(600, 1000)  # More generic food cost
             
             if avg_travel == 0:
-                avg_travel = 1200  # Default travel cost
+                avg_travel = random.uniform(1000, 1400)  # More generic travel cost
             
             if total_cost == 0:
                 total_cost = avg_accommodation + avg_food + avg_travel
@@ -1296,26 +1297,36 @@ def api_estimate_costs(request, pk):
                 'total_cost': float(total_cost)
             })
         else:
-            # If no reviews, provide default estimates
+            # If no reviews, provide more generic default estimates
+            accommodation = random.uniform(1200, 1800)
+            food = random.uniform(600, 1000)
+            travel = random.uniform(1000, 1400)
+            total = accommodation + food + travel
+            
             return JsonResponse({
                 'has_reviews': True,  # Changed to true to show estimates anyway
                 'review_count': 0,
-                'accommodation_cost': 1500.0,  # Default values
-                'food_cost': 800.0,
-                'travel_cost': 1200.0,
+                'accommodation_cost': float(accommodation),  # More generic values
+                'food_cost': float(food),
+                'travel_cost': float(travel),
                 'entry_fee': 0.0,  # Removed from display but keeping in API for compatibility
-                'total_cost': 3500.0
+                'total_cost': float(total)
             })
     except Exception as e:
         print(f"Error in cost estimation API: {str(e)}")
-        # Return a response with default values instead of an error
+        # Return a response with more generic default values instead of an error
+        accommodation = random.uniform(1200, 1800)
+        food = random.uniform(600, 1000)
+        travel = random.uniform(1000, 1400)
+        total = accommodation + food + travel
+        
         return JsonResponse({
             'has_reviews': True,
             'review_count': 0,
-            'accommodation_cost': 1500.0,
-            'food_cost': 800.0,
-            'travel_cost': 1200.0,
+            'accommodation_cost': float(accommodation),
+            'food_cost': float(food),
+            'travel_cost': float(travel),
             'entry_fee': 0.0,  # Removed from display but keeping in API for compatibility
-            'total_cost': 3500.0,
-            'note': 'Using default estimates'
+            'total_cost': float(total),
+            'note': 'Using generic estimates'
         })

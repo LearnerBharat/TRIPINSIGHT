@@ -18,14 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.animationDelay = `${delay}s`;
     });
     
-    // Create page loader element if it doesn't exist
+    // Create page loader element if it doesn't exist - improved version
     let loader = document.querySelector('.page-loader');
     if (!loader) {
         loader = document.createElement('div');
         loader.className = 'page-loader';
-        loader.innerHTML = '<div class="loader-spinner"></div>';
         document.body.appendChild(loader);
     }
+    
+    // Create inline loaders for content that needs it
+    document.querySelectorAll('[data-loading="true"]').forEach(el => {
+        const dotLoader = document.createElement('div');
+        dotLoader.className = 'dot-loader';
+        dotLoader.innerHTML = '<span></span><span></span><span></span>';
+        el.appendChild(dotLoader);
+    });
     
     // Store the current page URL for back button handling
     if (window.history && window.history.replaceState) {
@@ -84,6 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
             !link.hasAttribute('download') &&
             !link.hasAttribute('target')) {
             
+            // Skip transition for logout links to ensure proper session clearing
+            if (link.href.includes('/logout/') || link.classList.contains('logout-button')) {
+                return; // Let the browser handle the logout link normally
+            }
+            
             e.preventDefault();
             
             // Get the target URL
@@ -102,23 +114,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show transition effect with transform for smoother animation
             document.body.classList.add('page-transition');
             
+            // Show loader immediately for better UX
+            loader.classList.add('active');
+            
             // Check if the page is already in cache
             if (pageCache[targetUrl]) {
                 // Use a shorter transition for cached pages
                 setTimeout(() => {
                     window.location.href = targetUrl;
-                }, 180);
+                }, 150); // Slightly faster for cached pages
             } else {
-                // Only show loader for transitions that take longer than 120ms
-                const loaderTimeout = setTimeout(function() {
-                    loader.classList.add('active');
-                }, 120);
-                
-                // Navigate after a short delay
+                // Navigate after a short delay - enough for transition but not too slow
                 setTimeout(function() {
-                    clearTimeout(loaderTimeout); // Clear the loader timeout
                     window.location.href = targetUrl;
-                }, 250);
+                }, 200);
             }
         }
     });
@@ -132,18 +141,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show a faster, smoother transition for back button
             document.body.classList.add('page-transition');
             
+            // Show loader for consistency
+            loader.classList.add('active');
+            
             // Check if the page is in cache for faster navigation
             const targetUrl = event.state.url;
             if (pageCache[targetUrl]) {
                 // Ultra-fast transition for cached back navigation
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 80);
+                }, 100); // Slightly faster but still smooth
             } else {
                 // Navigate to the previous page with a short delay
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 120);
+                }, 150); // Slightly faster but still smooth
             }
         }
     });
@@ -161,18 +173,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add transition class for smooth fade-out
                     document.body.classList.add('page-transition');
                     
-                    // Add a subtle transform effect during form submission
-                    document.body.style.transform = 'translateY(-5px)';
+                    // Show loader immediately for better feedback
+                    loader.classList.add('active');
                     
-                    // Only show loader for submissions that take longer than 120ms
-                    setTimeout(function() {
-                        loader.classList.add('active');
-                    }, 120);
-                    
-                    // Reset transform after transition completes
-                    setTimeout(function() {
-                        document.body.style.transform = '';
-                    }, 300);
+                    // Add submit button feedback
+                    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                    if (submitBtn) {
+                        // Store original text
+                        const originalText = submitBtn.innerHTML;
+                        
+                        // Add loading state
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('submitting');
+                        
+                        // If it's not an input element, we can change the content
+                        if (submitBtn.tagName.toLowerCase() !== 'input') {
+                            submitBtn.innerHTML = '<div class="dot-loader"><span></span><span></span><span></span></div>';
+                        }
+                        
+                        // Reset button after timeout (in case form submission fails)
+                        setTimeout(() => {
+                            if (document.body.contains(submitBtn)) {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('submitting');
+                                if (submitBtn.tagName.toLowerCase() !== 'input') {
+                                    submitBtn.innerHTML = originalText;
+                                }
+                            }
+                        }, 5000);
+                    }
                 }
             });
         }

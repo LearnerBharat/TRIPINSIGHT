@@ -67,6 +67,19 @@
         font-family: 'Arial', sans-serif;
         animation: fadeIn 0.5s ease-in-out;
     }
+    
+    .loader-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 25px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin: 15px 0;
+        border: 1px solid #eee;
+    }
 
     .travel-cost p {
         margin: 10px 0;
@@ -96,12 +109,136 @@
         color: #FF5722;
         font-weight: 600;
     }
+    
+    .cost-note {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+        margin-top: 10px;
+        text-align: center;
+    }
+    
+    .travel-cost h4 {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 16px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+    
+    .additional-costs {
+        margin-top: 20px;
+    }
+    
+    /* Map container styling */
+    .map-container {
+        height: 400px;
+        min-height: 400px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+    
+    .map-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    /* Image loading animations */
+    .place-image, .image-container {
+        position: relative;
+        overflow: hidden;
+        background-color: #f0f0f0;
+    }
+    
+    .place-image::before, .image-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+        animation: loading-shimmer 1.5s infinite;
+        z-index: 1;
+    }
+    
+    .place-image img, .image-container img {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .place-image img.loaded, .image-container img.loaded {
+        opacity: 1;
+    }
+    
+    .place-image.loaded::before, .image-container.loaded::before {
+        animation: none;
+        opacity: 0;
+    }
+    
+    @keyframes loading-shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
 
     /* Error styling */
     #cost-display p[style*='color:red'] {
         color: #D32F2F !important;
         font-weight: bold;
         animation: shake 0.4s ease-in-out;
+    }
+    
+    .error-message {
+        color: #D32F2F;
+        padding: 15px;
+        background-color: rgba(211, 47, 47, 0.05);
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid rgba(211, 47, 47, 0.2);
+    }
+    
+    .error-message p {
+        margin: 5px 0 15px;
+        color: #555;
+    }
+    
+    .retry-button {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .retry-button:hover {
+        background-color: #eee;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .retry-button i {
+        font-size: 12px;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
     }
 
     /* Animations */
@@ -335,7 +472,23 @@
                 </div>
             </div>
             <div class="place-image">
-                <img src="{{single_place.Image_url}}" alt="{{single_place.Name}}">
+                {% if single_place.Image_url and "http" in single_place.Image_url %}
+                <img src="{{single_place.Image_url}}" alt="{{single_place.Name}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80';">
+                {% elif single_place.Type == 'beach' %}
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% elif single_place.Type == 'mountain' %}
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% elif single_place.Type == 'heritage' %}
+                <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% elif single_place.Type == 'wildlife' %}
+                <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% elif single_place.Type == 'pilgrimage' %}
+                <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% elif single_place.Type == 'adventure' %}
+                <img src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="{{single_place.Name}}">
+                {% endif %}
                 <div class="image-overlay">
                     <button class="gallery-button">
                         <i class="fas fa-images"></i> View Gallery
@@ -359,7 +512,23 @@
                         <li>
                             <a href="/details/{{i.id}}">
                                 <div class="image-container">
-                                    <img src="{{i.Image_url}}" alt="{{i.Name}}">
+                                    {% if i.Image_url and "http" in i.Image_url %}
+                                    <img src="{{i.Image_url}}" alt="{{i.Name}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';">
+                                    {% elif i.Type == 'beach' %}
+                                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% elif i.Type == 'mountain' %}
+                                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% elif i.Type == 'heritage' %}
+                                    <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% elif i.Type == 'wildlife' %}
+                                    <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% elif i.Type == 'pilgrimage' %}
+                                    <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% elif i.Type == 'adventure' %}
+                                    <img src="https://images.unsplash.com/photo-1533130061792-64b345e4a833?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% else %}
+                                    <img src="https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="{{i.Name}}">
+                                    {% endif %}
                                     <span class="badge">Popular</span>
                                 </div>
                                 <div class="content">
@@ -503,6 +672,36 @@
     {% include 'includes/footer.html' %}
 
     <script>
+        // Handle image loading animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.place-image img, .image-container img');
+            
+            images.forEach(img => {
+                // Add loaded class when image is loaded
+                img.addEventListener('load', function() {
+                    this.classList.add('loaded');
+                    // Remove shimmer effect from parent container
+                    if (this.parentElement.classList.contains('place-image')) {
+                        this.parentElement.classList.add('loaded');
+                    }
+                    if (this.parentElement.classList.contains('image-container')) {
+                        this.parentElement.classList.add('loaded');
+                    }
+                });
+                
+                // If image is already loaded (from cache)
+                if (img.complete) {
+                    img.classList.add('loaded');
+                    if (img.parentElement.classList.contains('place-image')) {
+                        img.parentElement.classList.add('loaded');
+                    }
+                    if (img.parentElement.classList.contains('image-container')) {
+                        img.parentElement.classList.add('loaded');
+                    }
+                }
+            });
+        });
+        
         function getCurrentLocation(callback) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -522,11 +721,11 @@
         }
 
         function estimateTravelCost(destination) {
-            // Show loader
+            // Show improved loader
             document.getElementById('cost-display').innerHTML = `
         <div class="loader-container">
-            <div class="loader"></div>
-            <p>Calculating travel cost...</p>
+            <div class="loader-spinner"></div>
+            <p style="margin-top: 15px; color: #555;">Calculating travel costs for your trip...</p>
         </div>
     `;
 
@@ -546,20 +745,54 @@
                     .then((data) => {
                         if (data.car_cost && data.train_cost && data.air_cost) {
                             // Hide loader and show results
+                            // Round costs to nearest 100 for more generic estimates
+                            const carCost = Math.round(data.car_cost / 100) * 100;
+                            const trainCost = Math.round(data.train_cost / 100) * 100;
+                            const airCost = Math.round(data.air_cost / 100) * 100;
+                            const busCost = data.bus_cost ? Math.round(data.bus_cost / 100) * 100 : Math.round(trainCost * 0.6 / 100) * 100;
+                            
+                            // Add accommodation and food costs if available
+                            const accommodationCost = data.accommodation_cost ? Math.round(data.accommodation_cost / 100) * 100 : 1500;
+                            const foodCost = data.food_cost ? Math.round(data.food_cost / 100) * 100 : 800;
+                            
                             document.getElementById('cost-display').innerHTML = `
                     <div class="travel-cost">
-                        <p><span class="mode">🚗 Car:</span> <span class="price">₹${data.car_cost}</span></p>
-                        <p><span class="mode">🚆 Train:</span> <span class="price">₹${data.train_cost}</span></p>
-                        <p><span class="mode">✈️ Airplane:</span> <span class="price">₹${data.air_cost}</span></p>
+                        <h4>Travel Options (One-way):</h4>
+                        <p><span class="mode">🚗 Car:</span> <span class="price">₹${carCost} - ₹${carCost + 500}</span></p>
+                        <p><span class="mode">🚆 Train:</span> <span class="price">₹${trainCost} - ₹${trainCost + 500}</span></p>
+                        <p><span class="mode">🚌 Bus:</span> <span class="price">₹${busCost} - ₹${busCost + 300}</span></p>
+                        <p><span class="mode">✈️ Airplane:</span> <span class="price">₹${airCost} - ₹${airCost + 1000}</span></p>
+                        
+                        <h4 class="additional-costs">Daily Expenses (per person):</h4>
+                        <p><span class="mode">🏨 Accommodation:</span> <span class="price">₹${accommodationCost} - ₹${accommodationCost + 1000}</span></p>
+                        <p><span class="mode">🍽️ Food:</span> <span class="price">₹${foodCost} - ₹${foodCost + 500}</span></p>
+                        
+                        <p class="cost-note">*Estimated cost ranges based on average travel expenses</p>
                     </div>
                 `;
                         } else {
-                            document.getElementById('cost-display').innerHTML = "<p style='color:red;'>Unable to calculate cost. Please try again.</p>";
+                            document.getElementById('cost-display').innerHTML = `
+                                <div class="error-message">
+                                    <i class="fas fa-exclamation-circle" style="color: #D32F2F; margin-right: 8px;"></i>
+                                    <p>Unable to calculate costs. Please try again.</p>
+                                    <button onclick="estimateTravelCost('${destination}')" class="retry-button">
+                                        <i class="fas fa-redo-alt"></i> Retry
+                                    </button>
+                                </div>
+                            `;
                         }
                     })
                     .catch((error) => {
                         console.error("Error:", error);
-                        document.getElementById('cost-display').innerHTML = "<p style='color:red;'>Something went wrong. Please try again.</p>";
+                        document.getElementById('cost-display').innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle" style="color: #D32F2F; margin-right: 8px;"></i>
+                                <p>Something went wrong. Please check your connection and try again.</p>
+                                <button onclick="estimateTravelCost('${destination}')" class="retry-button">
+                                    <i class="fas fa-redo-alt"></i> Retry
+                                </button>
+                            </div>
+                        `;
                     });
             });
         }

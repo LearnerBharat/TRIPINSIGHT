@@ -1,23 +1,26 @@
 /* Page Transition Styles - Enhanced for performance and elegance */
 body {
     opacity: 1;
-    transition: opacity 0.25s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                transform 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     will-change: opacity, transform;
     overflow-x: hidden; /* Prevent horizontal scrolling during transitions */
     transform-origin: center;
     backface-visibility: hidden; /* Prevent flickering in some browsers */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    perspective: 1000px; /* Improve performance for 3D transforms */
+    transform-style: preserve-3d; /* Better 3D rendering */
 }
 
 body.page-transition {
     opacity: 0;
-    transform: translateY(-5px) scale(0.99);
+    transform: translateY(-3px) scale(0.99);
+    pointer-events: none; /* Prevent clicks during transition */
 }
 
 .fade-in {
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     will-change: opacity, transform;
     backface-visibility: hidden;
 }
@@ -25,7 +28,7 @@ body.page-transition {
 @keyframes fadeIn {
     0% {
         opacity: 0;
-        transform: translateY(8px) scale(0.99);
+        transform: translateY(5px) scale(0.99);
     }
     100% {
         opacity: 1;
@@ -163,12 +166,12 @@ img {
     top: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background-color: transparent;
+    height: 4px;
+    background-color: rgba(0, 0, 0, 0.05);
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.15s ease;
 }
 
 .page-loader.active {
@@ -183,14 +186,16 @@ img {
     height: 100%;
     width: 0;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    animation: progress 1s ease-out forwards;
-    box-shadow: 0 0 8px rgba(52, 121, 40, 0.5);
+    animation: progress 0.8s cubic-bezier(0.1, 0.05, 0.25, 1) forwards;
+    box-shadow: 0 0 10px rgba(52, 121, 40, 0.6);
+    border-radius: 0 2px 2px 0;
 }
 
 @keyframes progress {
     0% { width: 0; }
-    50% { width: 65%; }
-    80% { width: 85%; }
+    30% { width: 40%; }
+    60% { width: 75%; }
+    90% { width: 90%; }
     100% { width: 100%; }
 }
 

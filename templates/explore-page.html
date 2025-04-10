@@ -36,57 +36,41 @@
   <section class="filter-section">
     <div class="container">
       <div class="filter-container">
-        <a href="?type=all" class="filter-item {% if not request.GET.type %}active{% endif %}">
+        <a href="?{% if selected_state %}state={{ selected_state }}{% endif %}{% if selected_state and selected_significance %}&{% endif %}{% if selected_significance %}significance={{ selected_significance }}{% endif %}" class="filter-item {% if not selected_type %}active{% endif %}">
           <i class="fa-solid fa-globe"></i>
           <span>All</span>
         </a>
-        <a href="?type=beach" class="filter-item {% if request.GET.type == 'beach' %}active{% endif %}">
+        <a href="?type=beach{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'beach' %}active{% endif %}">
           <i class="fa-solid fa-umbrella-beach"></i>
           <span>Beaches</span>
         </a>
-        <a href="?type=mountain" class="filter-item {% if request.GET.type == 'mountain' %}active{% endif %}">
+        <a href="?type=mountain{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'mountain' %}active{% endif %}">
           <i class="fa-solid fa-mountain"></i>
           <span>Mountains</span>
         </a>
-        <a href="?type=heritage" class="filter-item {% if request.GET.type == 'heritage' %}active{% endif %}">
+        <a href="?type=heritage{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'heritage' %}active{% endif %}">
           <i class="fa-solid fa-landmark"></i>
           <span>Heritage</span>
         </a>
-        <a href="?type=wildlife" class="filter-item {% if request.GET.type == 'wildlife' %}active{% endif %}">
+        <a href="?type=wildlife{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'wildlife' %}active{% endif %}">
           <i class="fa-solid fa-paw"></i>
           <span>Wildlife</span>
         </a>
-        <a href="?type=pilgrimage" class="filter-item {% if request.GET.type == 'pilgrimage' %}active{% endif %}">
+        <a href="?type=pilgrimage{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'pilgrimage' %}active{% endif %}">
           <i class="fa-solid fa-place-of-worship"></i>
           <span>Pilgrimage</span>
         </a>
-        <a href="?type=adventure" class="filter-item {% if request.GET.type == 'adventure' %}active{% endif %}">
+        <a href="?type=adventure{% if selected_state %}&state={{ selected_state }}{% endif %}{% if selected_significance %}&significance={{ selected_significance }}{% endif %}" class="filter-item {% if selected_type == 'adventure' %}active{% endif %}">
           <i class="fa-solid fa-person-hiking"></i>
           <span>Adventure</span>
         </a>
       </div>
       
-      <!-- State Filters -->
-      <div class="state-filters">
-        <div class="state-filter-header">
-          <h3>Popular States</h3>
-        </div>
-        <div class="state-filter-buttons">
-          <a href="?state=Maharashtra" class="state-filter-btn {% if request.GET.state == 'Maharashtra' %}active{% endif %}">
-            Maharashtra
-          </a>
-          <a href="?state=Goa" class="state-filter-btn {% if request.GET.state == 'Goa' %}active{% endif %}">
-            Goa
-          </a>
-          <a href="?state=Kerala" class="state-filter-btn {% if request.GET.state == 'Kerala' %}active{% endif %}">
-            Kerala
-          </a>
-          <a href="?state=Rajasthan" class="state-filter-btn {% if request.GET.state == 'Rajasthan' %}active{% endif %}">
-            Rajasthan
-          </a>
-          <a href="?state=Himachal Pradesh" class="state-filter-btn {% if request.GET.state == 'Himachal Pradesh' %}active{% endif %}">
-            Himachal Pradesh
-          </a>
+      <!-- Advanced Search Note -->
+      <div class="advanced-search-note">
+        <div class="note-content">
+          <i class="fas fa-info-circle"></i>
+          <p>Looking for more specific filters? Use the <a href="/">advanced search</a> on our homepage.</p>
         </div>
       </div>
     </div>
@@ -95,7 +79,7 @@
   <!-- Main Content -->
   <section id="destinations" class="main-content">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header" id="destinations-header">
         <h2>Popular Destinations</h2>
         <p>Explore the most visited and highly rated destinations across India</p>
       </div>
@@ -328,7 +312,7 @@
         img.addEventListener('load', function() {
           this.classList.add('loaded');
           // Remove shimmer effect from parent container
-          if (this.parentElement.classList.contains('card-img-container')) {
+          if (this.parentElement && this.parentElement.classList.contains('card-img-container')) {
             this.parentElement.classList.add('loaded');
           }
           // For featured cards, the image might be deeper in the DOM
@@ -341,7 +325,7 @@
         // If image is already loaded (from cache)
         if (img.complete) {
           img.classList.add('loaded');
-          if (img.parentElement.classList.contains('card-img-container')) {
+          if (img.parentElement && img.parentElement.classList.contains('card-img-container')) {
             img.parentElement.classList.add('loaded');
           }
           const featuredCard = img.closest('.featured-card');
@@ -383,8 +367,36 @@
           }, 20);
         }
       });
+      
+      // Handle browser back/forward navigation
+      window.addEventListener('popstate', function(event) {
+        // If there's a hash in the URL after navigation
+        if (window.location.hash) {
+          // Wait a brief moment for the browser's default scroll to complete
+          setTimeout(() => {
+            const targetId = window.location.hash;
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+              // Get the navbar height to offset the scroll position
+              const navbar = document.querySelector('.navbar');
+              const navbarHeight = navbar ? navbar.offsetHeight : 0;
+              
+              // Calculate the target position with offset
+              const extraOffset = targetId === '#destinations' ? 150 : 100;
+              const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - extraOffset;
+              
+              // Smooth scroll to the element
+              window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }
+          }, 100);
+        }
+      });
 
-      // Smooth scroll for anchor links
+      // Enhanced smooth scroll for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
           e.preventDefault();
@@ -392,9 +404,41 @@
           const targetId = this.getAttribute('href');
           if (targetId === '#') return;
 
-          const targetElement = document.querySelector(targetId);
+          // Add active class to the clicked button for visual feedback
+          if (this.classList.contains('btn-primary')) {
+            this.classList.add('btn-scrolling');
+            // Keep the animation for 1.5 seconds for better visual feedback
+            setTimeout(() => {
+              this.classList.remove('btn-scrolling');
+            }, 1500);
+          }
+          
+          // For the destinations button, target the header instead of the section
+          // This provides better positioning
+          let targetElement;
+          if (targetId === '#destinations' && document.getElementById('destinations-header')) {
+            targetElement = document.getElementById('destinations-header');
+          } else {
+            targetElement = document.querySelector(targetId);
+          }
           if (targetElement) {
-            targetElement.scrollIntoView({
+            // Get the navbar height to offset the scroll position
+            const navbar = document.querySelector('.navbar');
+            const navbarHeight = navbar ? navbar.offsetHeight : 0;
+            
+            // Calculate the target position with a larger offset to show more of the section
+            // This ensures the "Explore" buttons on cards are visible
+            // For the destinations section, use a larger offset to show more cards
+            const extraOffset = targetId === '#destinations' ? 150 : 100;
+            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - extraOffset;
+            
+            // First update the URL hash properly to support back button navigation
+            // This will add the hash to browser history
+            window.history.pushState({ scrollTarget: targetId }, '', targetId);
+            
+            // Then scroll to the position
+            window.scrollTo({
+              top: targetPosition,
               behavior: 'smooth'
             });
           }

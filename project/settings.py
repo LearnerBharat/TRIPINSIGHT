@@ -150,3 +150,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # API Keys - should be set in environment variables in production
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+
+# Ensure consistent handling of trailing slashes in URLs
+APPEND_SLASH = True

@@ -1,4 +1,13 @@
-// Enhanced Page Transition Handling with Preloading
+// Enhanced Page Transition Handling with Preloading - Optimized for Smoother Experience
+// Function to normalize URLs by handling trailing slashes consistently
+function normalizeUrl(url) {
+    // Remove trailing slash if it exists (except for root URL)
+    if (url.length > 1 && url.endsWith('/')) {
+        return url.slice(0, -1);
+    }
+    return url;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Cache for preloaded pages
     const pageCache = {};
@@ -6,11 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove any transition classes that might be left from previous page
     document.body.classList.remove('page-transition');
     
-    // Add fade-in class to body when page loads
-    document.body.classList.add('fade-in');
+    // Add fade-in class to body when page loads with a slight delay for better rendering
+    setTimeout(() => {
+        document.body.classList.add('fade-in');
+    }, 10);
     
     // Add stagger animation class to cards and list items with optimized timing
-    const staggerItems = document.querySelectorAll('.card, .place-card, .review-card, .list-item, .experience-card');
+    const staggerItems = document.querySelectorAll('.card, .place-card, .review-card, .list-item, .experience-card, .destination-card, .attraction-card, .poi-item');
     staggerItems.forEach((item, index) => {
         item.classList.add('stagger-item');
         // Limit animation delay to prevent too long animations
@@ -18,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.animationDelay = `${delay}s`;
     });
     
-    // Create page loader element if it doesn't exist - improved version
+    // Create page loader element if it doesn't exist - improved version with better visibility
     let loader = document.querySelector('.page-loader');
     if (!loader) {
         loader = document.createElement('div');
@@ -36,34 +47,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Store the current page URL for back button handling
     if (window.history && window.history.replaceState) {
+        // Normalize URL to handle trailing slash issues
+        const currentUrl = window.location.href;
+        const normalizedUrl = normalizeUrl(currentUrl);
+        
+        // Store both versions of the URL to handle trailing slash issues
         const currentState = {
-            url: window.location.href,
+            url: currentUrl,
+            normalizedUrl: normalizedUrl,
             title: document.title,
             wasBackButton: false
         };
         window.history.replaceState(currentState, document.title, window.location.href);
     }
     
-    // Preload pages when hovering over links
+    // Preload pages when hovering over links - optimized to reduce unnecessary requests
     const preloadLinks = () => {
-        const links = document.querySelectorAll('a:not([href^="#"]):not([href^="javascript:"]):not([download]):not([target])');
+        // Only select links that are likely to be navigated to
+        const links = document.querySelectorAll('a.card-link, a.nav-link, .destination-card a, .filter-item, .state-filter-btn, .breadcrumb a, .tab-button');
         
         links.forEach(link => {
-            if (link.href && link.href.indexOf(window.location.origin) === 0) {
+            if (link.href && link.href.indexOf(window.location.origin) === 0 && 
+                !link.href.includes('#') && 
+                !link.hasAttribute('download') && 
+                !link.hasAttribute('target')) {
+                
+                // Use mouseenter for desktop and touchstart for mobile
                 link.addEventListener('mouseenter', () => {
                     const url = link.href;
                     
-                    // Only preload if not already in cache
-                    if (!pageCache[url]) {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('GET', url, true);
-                        xhr.onload = function() {
-                            if (xhr.status >= 200 && xhr.status < 400) {
-                                pageCache[url] = xhr.responseText;
-                                console.log('Preloaded:', url);
-                            }
-                        };
-                        xhr.send();
+                    // Only preload if not already in cache and not the current page
+                    if (!pageCache[url] && url !== window.location.href) {
+                        // Use a small delay to avoid preloading links that are just being passed over
+                        const preloadTimeout = setTimeout(() => {
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('GET', url, true);
+                            xhr.onload = function() {
+                                if (xhr.status >= 200 && xhr.status < 400) {
+                                    pageCache[url] = xhr.responseText;
+                                }
+                            };
+                            xhr.send();
+                        }, 100);
+                        
+                        // Cancel the preload if the mouse leaves quickly
+                        link.addEventListener('mouseleave', () => {
+                            clearTimeout(preloadTimeout);
+                        }, { once: true });
                     }
                 });
             }
@@ -73,8 +103,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize preloading
     preloadLinks();
     
-    // Refresh preload links when content changes (for dynamic content)
-    const observer = new MutationObserver(preloadLinks);
+    // Refresh preload links when content changes (for dynamic content) - with throttling
+    let preloadTimeout;
+    const observer = new MutationObserver(() => {
+        clearTimeout(preloadTimeout);
+        preloadTimeout = setTimeout(preloadLinks, 500);
+    });
     observer.observe(document.body, { childList: true, subtree: true });
     
     // Handle all internal link clicks for smooth transitions
@@ -82,11 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find closest anchor tag if the click was on a child element
         const link = e.target.closest('a');
         
-        // If it's an internal link (not external, not anchor, not javascript, not download)
+        // If it's an internal link
         if (link && 
             link.href && 
             link.href.indexOf(window.location.origin) === 0 && 
-            !link.href.includes('#') && 
             !link.href.includes('javascript:') &&
             !link.hasAttribute('download') &&
             !link.hasAttribute('target')) {
@@ -96,15 +129,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 return; // Let the browser handle the logout link normally
             }
             
+            // Handle hash links differently - let the browser handle them normally
+            // This ensures proper tab switching and back button functionality
+            if (link.href.includes('#')) {
+                // If it's a hash link on the same page, let the browser handle it
+                if (link.href.split('#')[0] === window.location.href.split('#')[0]) {
+                    return;
+                }
+            }
+            
             e.preventDefault();
             
-            // Get the target URL
+            // Get the target URL and normalize it
             const targetUrl = link.href;
+            const normalizedTargetUrl = normalizeUrl(targetUrl);
             
             // Store the current URL in history state
             if (window.history && window.history.pushState) {
+                // Store both the target URL and the current URL to handle trailing slash issues
                 const state = {
                     url: targetUrl,
+                    normalizedUrl: normalizedTargetUrl,
+                    previousUrl: window.location.href,
+                    normalizedPreviousUrl: normalizeUrl(window.location.href),
                     title: document.title,
                     wasBackButton: false
                 };
@@ -122,18 +169,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Use a shorter transition for cached pages
                 setTimeout(() => {
                     window.location.href = targetUrl;
-                }, 150); // Slightly faster for cached pages
+                }, 120); // Faster for cached pages
             } else {
                 // Navigate after a short delay - enough for transition but not too slow
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 200);
+                }, 180);
             }
         }
     });
     
     // Handle browser back/forward buttons with improved transitions
     window.addEventListener('popstate', function(event) {
+        // Check if the URL has a hash - if so, we're just changing tabs, not pages
+        if (window.location.hash) {
+            // Don't reload the page for hash changes - the tab handlers will take care of this
+            return;
+        }
+        
+        // Normalize the current URL to handle trailing slash consistently
+        const normalizedCurrentUrl = normalizeUrl(window.location.href);
+        
+        // If we're just navigating between URLs that differ only by trailing slash,
+        // we should navigate to the actual previous page instead
         if (event.state) {
             // Mark this as a back button navigation
             event.state.wasBackButton = true;
@@ -144,18 +202,31 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loader for consistency
             loader.classList.add('active');
             
+            // Get the target URL from history state
+            let targetUrl = event.state.url;
+            
+            // Normalize the target URL to handle trailing slash consistently
+            const normalizedTargetUrl = normalizeUrl(targetUrl);
+            
+            // Check if we need to go back further (in case of trailing slash issue)
+            if (normalizedTargetUrl === normalizedCurrentUrl) {
+                // We're just toggling between slash/no-slash versions of the same URL
+                // Go back one more step in history
+                window.history.back();
+                return;
+            }
+            
             // Check if the page is in cache for faster navigation
-            const targetUrl = event.state.url;
             if (pageCache[targetUrl]) {
                 // Ultra-fast transition for cached back navigation
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 100); // Slightly faster but still smooth
+                }, 80); // Faster but still smooth
             } else {
                 // Navigate to the previous page with a short delay
                 setTimeout(function() {
                     window.location.href = targetUrl;
-                }, 150); // Slightly faster but still smooth
+                }, 120); // Faster but still smooth
             }
         }
     });

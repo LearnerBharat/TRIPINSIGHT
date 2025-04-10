@@ -227,9 +227,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="/" class="nav-brand">
                             <i class="fas fa-compass"></i> TripInsight
                         </a>
+                        <div class="nav-menu">
+                            <div class="nav-links">
+                                <a href="/" class="nav-link">Home</a>
+                                <a href="/explore/" class="nav-link">Explore</a>
+                                <a href="/stories/" class="nav-link">Travel Stories</a>
+                                <a href="/about/" class="nav-link">About Us</a>
+                            </div>
+                        </div>
                     </div>
                 `;
                 document.body.insertBefore(fallbackNavbar, document.body.firstChild);
+                
+                // Add padding to body to account for fixed navbar
+                document.body.style.paddingTop = fallbackNavbar.offsetHeight + 'px';
             }
         }
     }, 100); // Increased delay to ensure authentication class is added

@@ -439,8 +439,8 @@
         <div class="hero-section">
             <div class="place-info">
                 <div class="breadcrumb">
-                    <a href="/">Home</a> > 
-                    <a href="/explore">Explore</a> > 
+                    <a href="{% url 'index' %}">Home</a> > 
+                    <a href="{% url 'explore' %}">Explore</a> > 
                     <span>{{single_place.Name}}</span>
                 </div>
                 <h1>{{single_place.Name}}</h1>
@@ -503,14 +503,14 @@
                 <div class="nearby-attractions">
                     <div class="section-header">
                         <h3>Nearby Attractions</h3>
-                        <a href="/explore?near={{single_place.City}}" class="view-all">
+                        <a href="{% url 'explore' %}?near={{single_place.City}}" class="view-all">
                             View All <i class="fas fa-chevron-right"></i>
                         </a>
                     </div>
                     <ul>
                         {% for i in rec_places %}
                         <li>
-                            <a href="/details/{{i.id}}">
+                            <a href="{% url 'details' pk=i.id %}">
                                 <div class="image-container">
                                     {% if i.Image_url and "http" in i.Image_url %}
                                     <img src="{{i.Image_url}}" alt="{{i.Name}}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';">
@@ -550,8 +550,15 @@
 
             </div>
             <div class="map-container">
-                <iframe src={{single_place.map_url}} allowfullscreen="" loading="lazy">
+                {% if single_place.map_url and single_place.map_url != "None" %}
+                <iframe src="{{single_place.map_url}}" allowfullscreen="" loading="lazy">
                 </iframe>
+                {% else %}
+                <div class="no-map-message">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <p>Map is currently unavailable for this location.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 

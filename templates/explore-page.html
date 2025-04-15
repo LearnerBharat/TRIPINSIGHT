@@ -127,7 +127,7 @@
               </div>
               {% endif %}
               <div class="card-actions">
-                <a href="/details/{{ i.id }}" class="card-link">
+                <a href="{% url 'details' pk=i.id %}" class="card-link">
                   Explore <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -152,7 +152,7 @@
           {% with featured_places.0 as featured %}
             <div class="featured-large">
               <div class="featured-card">
-                <a href="/details/{{ featured.id }}">
+                <a href="{% url 'details' pk=featured.id %}">
                   {% if featured.Image_url and "http" in featured.Image_url %}
                   <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
                   {% elif featured.Type == 'beach' %}
@@ -185,7 +185,7 @@
           {% for featured in featured_places|slice:"1:3" %}
             <div class="featured-small">
               <div class="featured-card">
-                <a href="/details/{{ featured.id }}">
+                <a href="{% url 'details' pk=featured.id %}">
                   {% if featured.Image_url and "http" in featured.Image_url %}
                   <img src="{{ featured.Image_url }}" alt="{{ featured.Name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
                   {% elif featured.Type == 'beach' %}

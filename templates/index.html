@@ -393,7 +393,7 @@
       <section class="results-section">
         <h2>Welcome To TripInsight</h2>
         {% for i in places %}
-        <a href="details/{{i.id}}">
+        <a href="{% url 'details' pk=i.id %}">
           <div class="result-card">
             <img src="{{ i.Image_url }}" alt="Waikiki Beach" />
             <div class="card-details">

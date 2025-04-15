@@ -764,7 +764,7 @@
                 autocomplete="off"
               />
             </div>
-            <button type="button" class="filter-toggle" onclick="toggleFilters()">
+            <button type="button" class="filter-toggle">
               <i class="fas fa-sliders-h"></i> Filters
             </button>
             <button type="submit" class="search-button">
@@ -915,7 +915,7 @@
             <p>{{ i.Description|truncatechars:100 }}</p>
             <div class="place-footer">
               <div class="place-location">{{ i.State }}</div>
-              <a href="/details/{{ i.id }}" class="place-link">
+              <a href="{% url 'details' pk=i.id %}" class="place-link">
                 Explore <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>
@@ -932,7 +932,7 @@
       <div class="cta-content">
         <h2>Ready to Explore India?</h2>
         <p>Discover the perfect destination for your next adventure with our comprehensive travel guides and authentic reviews</p>
-        <a href="/explore" class="cta-button">Start Exploring</a>
+        <a href="{% url 'explore' %}" class="cta-button">Start Exploring</a>
       </div>
     </div>
   </section>
@@ -955,22 +955,22 @@
         <div class="footer-section">
           <h3>Destinations</h3>
           <ul>
-            <li><a href="/search/?state=Rajasthan">Rajasthan</a></li>
-            <li><a href="/search/?state=Kerala">Kerala</a></li>
-            <li><a href="/search/?state=Goa">Goa</a></li>
-            <li><a href="/search/?state=Himachal+Pradesh">Himachal Pradesh</a></li>
-            <li><a href="/search/?state=Uttarakhand">Uttarakhand</a></li>
+            <li><a href="{% url 'search' %}?state=Rajasthan">Rajasthan</a></li>
+            <li><a href="{% url 'search' %}?state=Kerala">Kerala</a></li>
+            <li><a href="{% url 'search' %}?state=Goa">Goa</a></li>
+            <li><a href="{% url 'search' %}?state=Himachal+Pradesh">Himachal Pradesh</a></li>
+            <li><a href="{% url 'search' %}?state=Uttarakhand">Uttarakhand</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/explore">Explore</a></li>
-            <li><a href="/stories">Travel Stories</a></li>
-            <li><a href="/profile">My Profile</a></li>
+            <li><a href="{% url 'index' %}">Home</a></li>
+            <li><a href="{% url 'about' %}">About Us</a></li>
+            <li><a href="{% url 'explore' %}">Explore</a></li>
+            <li><a href="{% url 'stories' %}">Travel Stories</a></li>
+            <li><a href="{% url 'profile' %}">My Profile</a></li>
           </ul>
         </div>
 
@@ -1038,22 +1038,7 @@
       }
     });
     
-    function toggleFilters() {
-      const filters = document.getElementById('searchFilters');
-      if (filters) {
-        if (filters.classList.contains('show')) {
-          filters.classList.remove('show');
-          setTimeout(() => {
-            filters.style.display = 'none';
-          }, 10);
-        } else {
-          filters.style.display = 'grid';
-          setTimeout(() => {
-            filters.classList.add('show');
-          }, 10);
-        }
-      }
-    }
+    // Filter toggle functionality is handled by navbar.js
     
     function resetFilters() {
       const form = document.getElementById('searchForm');

@@ -1347,8 +1347,8 @@
         <div class="hero-section">
             <div class="place-info">
                 <div class="breadcrumb">
-                    <a href="/">Home</a> <i class="fas fa-chevron-right"></i>
-                    <a href="/explore">Explore</a> <i class="fas fa-chevron-right"></i>
+                    <a href="{% url 'index' %}">Home</a> <i class="fas fa-chevron-right"></i>
+                    <a href="{% url 'explore' %}">Explore</a> <i class="fas fa-chevron-right"></i>
                     <span>{{ single_place.Name }}</span>
                 </div>
                 <h1>{{ single_place.Name }}</h1>
@@ -1425,7 +1425,7 @@
                                     <div class="attraction-distance">
                                         <i class="fas fa-route"></i> Nearby attraction
                                     </div>
-                                    <a href="/details/{{ place.id }}" class="attraction-link">
+                                    <a href="{% url 'details' pk=place.id %}" class="attraction-link">
                                         Explore <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
@@ -1995,7 +1995,7 @@
                             <p>Explore {{ single_place.Name }} and its surroundings on the map below.</p>
                         </div>
                         <div class="map-container">
-                            {% if single_place.map_url %}
+                            {% if single_place.map_url and single_place.map_url != "None" %}
                                 <iframe src="{{ single_place.map_url }}" allowfullscreen="" loading="lazy"></iframe>
                             {% else %}
                                 <div class="no-map-message">

@@ -732,14 +732,14 @@
                 autocomplete="off"
               />
             </div>
-            <button type="button" class="filter-toggle" onclick="toggleFilters()">
+            <button type="button" class="filter-toggle">
               <i class="fas fa-sliders-h"></i> Filters
             </button>
             <button type="submit" class="search-button">
               <i class="fas fa-search"></i> Search
             </button>
           </div>
-          <div class="search-filters" id="searchFilters" style="display: none;">
+          <div class="search-filters" id="searchFilters">
             <div class="filter-group">
               <label for="state">State</label>
               <select name="state" id="state">
@@ -920,7 +920,7 @@
               <div class="place-location">
                 <i class="fas fa-map-marker-alt"></i> {{ place.City }}, {{ place.State }}
               </div>
-              <a href="/details/{{ place.id }}" class="place-link">
+              <a href="{% url 'details' pk=place.id %}" class="place-link">
                 Explore <i class="fas fa-arrow-right"></i>
               </a>
             </div>
@@ -950,37 +950,25 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize filters state
-      const filterToggle = document.querySelector('.filter-toggle');
-      const searchFilters = document.getElementById('searchFilters');
+      // Set filter values from URL parameters if they exist
+      const urlParams = new URLSearchParams(window.location.search);
       
-      if (filterToggle && searchFilters) {
-        // Check if filters should be shown (e.g., if there was a previous search with filters)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('state') || urlParams.has('type') || urlParams.has('significance') || urlParams.has('sort')) {
-          searchFilters.style.display = 'grid';
-          searchFilters.classList.add('show');
-        }
+      // Set the filter values from URL parameters
+      if (urlParams.has('state')) {
+        document.getElementById('state').value = urlParams.get('state');
+      }
+      if (urlParams.has('type')) {
+        document.getElementById('type').value = urlParams.get('type');
+      }
+      if (urlParams.has('significance')) {
+        document.getElementById('significance').value = urlParams.get('significance');
+      }
+      if (urlParams.has('sort')) {
+        document.getElementById('sort').value = urlParams.get('sort');
       }
     });
     
-    // Toggle search filters visibility
-    function toggleFilters() {
-      const filters = document.getElementById("searchFilters");
-      if (filters) {
-        if (filters.classList.contains('show')) {
-          filters.classList.remove('show');
-          setTimeout(() => {
-            filters.style.display = 'none';
-          }, 10);
-        } else {
-          filters.style.display = 'grid';
-          setTimeout(() => {
-            filters.classList.add('show');
-          }, 10);
-        }
-      }
-    }
+    // Filter toggle functionality is handled by navbar.js
     
     // Reset all filters and submit the form
     function resetFilters() {
@@ -1000,7 +988,7 @@
         searchInput.value = '';
       }
       
-      // Submit the form
+      // Submit the form to the search page with reset values
       form.submit();
     }
   </script>

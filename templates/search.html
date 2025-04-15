@@ -474,12 +474,12 @@
           {% if user.is_authenticated %}
           <button class="nav-button">
             <i class="fa-solid fa-user"></i>
-            <a href="/profile">Profile</a>
+            <a href="{% url 'profile' %}">Profile</a>
           </button>
           {% else %}
           <button class="nav-button">
             <i class="fa-solid fa-user"></i>
-            <a href="/sign-up">Sign In</a>
+            <a href="{% url 'sign_up' %}">Sign In</a>
           </button>
           {% endif %}
         </div>
@@ -495,7 +495,7 @@
         </div>
         <div class="experience-grid">
           {% for i in places %}
-          <a href="{% url 'details' i.id %}">
+          <a href="{% url 'details' pk=i.id %}">
             <div class="experience-card">
               <img src="{{ i.Image_url }}" alt="Kerala Backwaters" />
               <div class="card-content">

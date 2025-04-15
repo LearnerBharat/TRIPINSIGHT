@@ -18,7 +18,8 @@ from django.urls import reverse
 
 def index(request):
     user = request.user
-    places = PlaceMode.objects.all()
+    # Filter places to only show Maharashtra places
+    places = PlaceMode.objects.filter(State='Maharashtra')
     
     # Get all available states, types, and significances for filter dropdowns
     all_states = PlaceMode.objects.values_list('State', flat=True).distinct().order_by('State')
@@ -1156,8 +1157,8 @@ def explore(request):
         state = request.GET.get('state', '')
         significance = request.GET.get('significance', '')
         
-        # Start with all places
-        places = PlaceMode.objects.all()
+        # Start with all places in random order
+        places = PlaceMode.objects.all().order_by('?')
         
         # Apply filters if specified
         if place_type and place_type != 'all':
@@ -1232,9 +1233,9 @@ def explore(request):
         print(f"Explore view error: {str(e)}")
         messages.error(request, "An error occurred while loading the explore page. Please try again.")
         
-        # Return a minimal context with some places to show
+        # Return a minimal context with some random places to show
         return render(request, "explore-page.html", {
-            'places': PlaceMode.objects.all()[:12],
+            'places': PlaceMode.objects.all().order_by('?')[:12],
             'featured_places': PlaceMode.objects.all().order_by('?')[:3],
             'error_occurred': True
         })

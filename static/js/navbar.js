@@ -8,7 +8,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const body = document.body;
             // Check for authentication in multiple ways to ensure it works
             const isAuthenticated = document.body.classList.contains('user-authenticated');
-            console.log('Authentication state:', isAuthenticated);
+            
+            // Additional check for authentication from meta tag if available
+            const authMeta = document.querySelector('meta[name="user-authenticated"]');
+            const isAuthenticatedFromMeta = authMeta ? authMeta.getAttribute('content') === 'true' : false;
+            
+            // Use either method to determine authentication
+            const userIsAuthenticated = isAuthenticated || isAuthenticatedFromMeta;
+            console.log('Authentication state:', userIsAuthenticated);
 
         // Create navbar element
         const navbar = document.createElement('nav');
@@ -29,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="nav-actions">
                         ${
-                            isAuthenticated ?
+                            userIsAuthenticated ?
                             `
                             <a href="/profile/" class="nav-button">
                                 <i class="fa-solid fa-user"></i>
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="nav-actions">
                 ${
-                    isAuthenticated ?
+                    userIsAuthenticated ?
                     `
                     <a href="/profile/" class="nav-button">
                         <i class="fa-solid fa-user"></i>

@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TripInsight Explore</title>
+  <meta name="user-authenticated" content="{% if user.is_authenticated %}true{% else %}false{% endif %}">
   <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
   <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
   <link rel="stylesheet" href="{% static 'css/explore-styles.css' %}" />

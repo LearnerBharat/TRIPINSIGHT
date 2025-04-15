@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TripInsight - Discover Incredible India</title>
   <meta name="description" content="Explore the diverse beauty of India with TripInsight. Find destinations, read travel stories, and plan your perfect trip.">
+  <meta name="user-authenticated" content="{% if user.is_authenticated %}true{% else %}false{% endif %}">
   <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
   <link rel="stylesheet" href="{% static 'css/theme.css' %}" />
   <link rel="stylesheet" href="{% static 'css/transitions.css' %}" />

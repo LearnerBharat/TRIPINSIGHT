@@ -376,14 +376,14 @@ def search_view(request):
 def serialize_place(place):
     return {
         'id': place.id,
-        'name': place.Name,
-        'city': place.City,
-        'state': place.State,
-        'type': place.Type,
+        'name': place.Name or '',
+        'city': place.City or '',
+        'state': place.State or '',
+        'type': place.Type or '',
         'description': place.Description[:100] if place.Description else '',
-        'rating': place.Google_rating,
-        'image_url': place.Image_url,
-        'significance': place.Significance
+        'rating': place.Google_rating or '',
+        'image_url': place.Image_url or '',
+        'significance': place.Significance or ''
     }
 
 def signup_view(request):
@@ -1085,25 +1085,35 @@ def stories(request):
         elif sort_by == 'rating_low':
             reviews = reviews.order_by('rating')
         elif sort_by == 'cost_high':
-            # Calculate total cost for sorting
+            # Calculate total cost for sorting with error handling
+            def get_total_cost(review):
+                try:
+                    travel = float(review.travel_cost) if review.travel_cost is not None else 0
+                    accommodation = float(review.accommodation_cost) if review.accommodation_cost is not None else 0
+                    food = float(review.food_cost) if review.food_cost is not None else 0
+                    return travel + accommodation + food
+                except (ValueError, TypeError):
+                    return 0
+                    
             reviews = sorted(
                 reviews,
-                key=lambda x: (
-                    float(x.travel_cost or 0) + 
-                    float(x.accommodation_cost or 0) + 
-                    float(x.food_cost or 0)
-                ),
+                key=get_total_cost,
                 reverse=True
             )
         elif sort_by == 'cost_low':
-            # Calculate total cost for sorting
+            # Calculate total cost for sorting with error handling
+            def get_total_cost(review):
+                try:
+                    travel = float(review.travel_cost) if review.travel_cost is not None else 0
+                    accommodation = float(review.accommodation_cost) if review.accommodation_cost is not None else 0
+                    food = float(review.food_cost) if review.food_cost is not None else 0
+                    return travel + accommodation + food
+                except (ValueError, TypeError):
+                    return 0
+                    
             reviews = sorted(
                 reviews,
-                key=lambda x: (
-                    float(x.travel_cost or 0) + 
-                    float(x.accommodation_cost or 0) + 
-                    float(x.food_cost or 0)
-                )
+                key=get_total_cost
             )
         
         # Get all available states for filter dropdown

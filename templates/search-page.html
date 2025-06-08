@@ -547,6 +547,8 @@
     </style>
   </head>
   <body class="{% if user.is_authenticated %}user-authenticated{% endif %}">
+    <!-- Include navbar -->
+    {% include 'includes/navbar.html' %}
     {% include 'includes/notifications.html' %}
     
     <!-- Add authentication class immediately to avoid FOUC (Flash of Unauthenticated Content) -->

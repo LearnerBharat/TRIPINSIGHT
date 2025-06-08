@@ -15,6 +15,8 @@
     <script src="{% static 'js/navbar.js' %}" defer></script>
   </head>
   <body>
+    <!-- Include navbar -->
+    {% include 'includes/navbar.html' %}
     {% include 'includes/notifications.html' %}
 
     <!-- Hero Section -->
@@ -112,7 +114,7 @@
           <div class="team-card">
             <div class="team-image">
               <img
-                src="https://media.licdn.com/dms/image/v2/D4D03AQH6FNjHAZGruQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1730619123927?e=1748476800&v=beta&t=d5NGqYmQdT9h7imHq_DUHBfLT3g0HGH8JxpZ6PtEDmo"
+                src="{% static 'BHARAT_PROFILE.png' %}"
                 alt="Bharat Sharma"
               />
             </div>
@@ -131,7 +133,7 @@
           <div class="team-card">
             <div class="team-image">
               <img
-                src="https://media.licdn.com/dms/image/v2/D4D03AQF8Ta3so0b4UA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718222176294?e=1748476800&v=beta&t=xfhb2QFB6feP-JAC_A5Nm9JcA2MS-xsfv0xLFhs_tYU"
+                src="{% static 'SHRUSHTI_PROFILE.jpg' %}"
                 alt="Shrushti Sabale"
               />
             </div>
@@ -150,7 +152,7 @@
           <div class="team-card">
             <div class="team-image">
               <img
-                src="https://media.licdn.com/dms/image/v2/D4D03AQEEBbmmMxMtEg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1721780100644?e=1748476800&v=beta&t=U1fwQ_jnKxRwFmuYDvLolgS3wk0PRYnLnh6J19dydbg"
+                src="{% static 'VEDANT_PROFILE.jpg' %}"
                 alt="Vedant Salunkhe"
               />
             </div>
@@ -169,7 +171,7 @@
           <div class="team-card">
             <div class="team-image">
               <img
-                src="https://media.licdn.com/dms/image/v2/D4D03AQEEBbmmMxMtEg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1721780100644?e=1748476800&v=beta&t=U1fwQ_jnKxRwFmuYDvLolgS3wk0PRYnLnh6J19dydbg"
+                src="{% static 'ROHIT_PROFILE.jpg' %}"
                 alt="Rohit Shinde"
               />
             </div>

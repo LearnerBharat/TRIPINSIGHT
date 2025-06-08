@@ -313,6 +313,8 @@
       overflow: hidden;
       box-shadow: var(--card-shadow);
       transition: var(--transition);
+      padding: 0;
+      margin: 0;
     }
     
     .team-card:hover {
@@ -323,22 +325,32 @@
     .team-image {
       height: 280px;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5f5f5;
+      padding: 0;
+      margin: 0;
     }
     
     .team-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center 20%;
       transition: transform 0.5s ease;
+      margin: 0;
+      padding: 0;
     }
     
     .team-card:hover .team-image img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
     
     .team-info {
-      padding: 25px;
+      padding: 20px;
       text-align: center;
+      width: 100%;
     }
     
     .team-info h3 {
@@ -664,7 +676,7 @@
       <div class="team-grid">
         <div class="team-card">
           <div class="team-image">
-            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bharat Sharma">
+            <img src="{% static 'BHARAT_PROFILE.png' %}" alt="Bharat Sharma">
           </div>
           <div class="team-info">
             <h3>Bharat Sharma</h3>
@@ -680,7 +692,7 @@
 
         <div class="team-card">
           <div class="team-image">
-            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Shrushti Sabale">
+            <img src="{% static 'SHRUSHTI_PROFILE.jpg' %}" alt="Shrushti Sabale">
           </div>
           <div class="team-info">
             <h3>Shrushti Sabale</h3>
@@ -696,7 +708,7 @@
 
         <div class="team-card">
           <div class="team-image">
-            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Vedant Salunkhe">
+            <img src="{% static 'VEDANT_PROFILE.jpg' %}" alt="Vedant Salunkhe">
           </div>
           <div class="team-info">
             <h3>Vedant Salunkhe</h3>
@@ -712,7 +724,7 @@
 
         <div class="team-card">
           <div class="team-image">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rohit Shinde">
+            <img src="{% static 'ROHIT_PROFILE.jpg' %}" alt="Rohit Shinde">
           </div>
           <div class="team-info">
             <h3>Rohit Shinde</h3>
